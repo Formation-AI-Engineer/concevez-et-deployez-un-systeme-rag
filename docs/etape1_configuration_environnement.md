@@ -29,14 +29,31 @@ réinstallable sur n'importe quelle machine à partir d'un fichier de dépendanc
 - [x] `uv sync --extra dev --extra eval` exécuté avec succès
 
 ### 1.2 Vérification des imports clés (énoncé)
-L'énoncé demande de tester les imports suivants (équivalents modernes utilisés ici) :
+
+#### Incohérences des imports de l'énoncé et corrections
+Le snippet de l'énoncé utilise des chemins d'import **obsolètes ou erronés** avec les versions actuelles
+(LangChain 1.x, SDK Mistral 2.x). Correspondance énoncé → équivalent moderne **réellement validé** :
+
+| Import de l'énoncé | État | Équivalent moderne utilisé | Paquet |
+|---|---|---|---|
+| `import faiss` | ✅ valide | inchangé | `faiss-cpu` |
+| `from langchain.vectorstores import FAISS` | ❌ `ModuleNotFoundError` | `from langchain_community.vectorstores import FAISS` | `langchain-community` |
+| `from langchain.embeddings import HuggingFaceEmbeddings` | ❌ déplacé | `from langchain_huggingface import HuggingFaceEmbeddings` | `langchain-huggingface` |
+| `from mistral import MistralClient` | ❌ paquet `mistral` inexistant | `from langchain_mistralai import ChatMistralAI` | `langchain-mistralai` |
+
+Note sur le SDK Mistral brut : le projet n'appelle pas Mistral en direct (il passe par
+`ChatMistralAI`), mais pour information, dans `mistralai==2.4.9` le client n'est **pas** exposé à la racine
+(`from mistralai import Mistral` échoue — `mistralai` est un *namespace package*). Le bon chemin est
+`from mistralai.client import Mistral`.
+
+Imports effectivement utilisés et vérifiés (`uv run python -c "..."`) :
 ```python
 import faiss
-from langchain_community.vectorstores import FAISS          # ancien : langchain.vectorstores
-from langchain_huggingface import HuggingFaceEmbeddings      # ancien : langchain.embeddings
-from langchain_mistralai import ChatMistralAI                # client Mistral via LangChain
+from langchain_community.vectorstores import FAISS          # énoncé: langchain.vectorstores (obsolète)
+from langchain_huggingface import HuggingFaceEmbeddings      # énoncé: langchain.embeddings (déplacé)
+from langchain_mistralai import ChatMistralAI                # énoncé: from mistral import MistralClient (inexistant)
 ```
-- [x] Imports vérifiés OK (`uv run python -c "..."`)
+- [x] Imports vérifiés OK — script reproductible `scripts/check_imports.py` (`uv run python scripts/check_imports.py`, exit 0)
 - [x] **Compatibilité des versions** FAISS ⇄ LangChain validée : `faiss-cpu==1.14.3`, `langchain==1.3.9`,
       `langchain-community==0.4.2` (FAISS accédé via `langchain_community.vectorstores.FAISS`),
       `langchain-mistralai==1.1.5`, `langchain-huggingface==1.2.2`, `sentence-transformers==5.5.1`,

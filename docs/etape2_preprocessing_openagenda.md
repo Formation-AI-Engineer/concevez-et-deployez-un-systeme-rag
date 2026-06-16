@@ -12,9 +12,24 @@ et les **structurer** (nettoyage + format propre) pour une indexation future dan
 - Un jeu de données d'événements **propre et structuré**, prêt à être indexé.
 - Des **tests unitaires** assurant que les données attendues ont bien été récupérées.
 
+## Stratégie de récupération (validée par exploration API — `scripts/explore_openagenda.py`)
+Exploration réelle de l'API v2 avec la clé du projet :
+- ❌ **Recherche globale d'événements** `/v2/events` → **HTTP 403** (accès restreint sur cette clé) : on ne
+  peut pas requêter d'un coup tous les événements d'une ville.
+- ✅ **Recherche d'agendas** `/v2/agendas?search=Paris` → OK (4755 agendas ; le terme matche le *titre* de
+  l'agenda, ex. « Diocèse de Paris », pas la localisation des événements).
+- ✅ **Événements d'un agenda** `/v2/agendas/{uid}/events` → OK, filtrable par date (`timings[gte]` /
+  `timings[lte]`), `detailed=1`, pagination ; champs riches : `title`, `description`, `longDescription`,
+  `location` (name, city, latitude, longitude), `timings`, `dateRange`, `categories`, `keywords`, `links`…
+
+**Décision** : récupération **par agenda(s)** ciblé(s) sur la zone (Paris) + filtre par date, puis
+**re-filtrage par `location.city`** au pré-processing pour ne garder que les événements réellement parisiens.
+Choix de l'agenda/des agendas source(s) → cf. tâche 2.1 (à confirmer).
+
 ## Tâches
 
 ### 2.1 Récupération des données (API Open Agenda)
+- [x] Exploration API + validation de la stratégie par agendas (`scripts/explore_openagenda.py`)
 - [ ] Module `rag/data_loader.py` : client de l'API Open Agenda (auth par `OPENAGENDA_API_KEY`)
 - [ ] Script CLI `scripts/fetch_events.py` : télécharge les événements → `data/raw/events.json`
 - [ ] Gérer la **pagination** de l'API (récupérer l'ensemble des événements de la zone)
