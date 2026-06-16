@@ -51,28 +51,31 @@ Prérequis : **Python 3.10–3.12** et [`uv`](https://docs.astral.sh/uv/).
 uv sync --extra dev --extra eval
 
 # 2. Configurer les secrets (clés API Mistral et Open Agenda)
-cp .env.example .env   # puis éditer .env
+cp .env.example .env.local   # puis renseigner MISTRAL_API_KEY et OPENAGENDA_API_KEY
 
-# 3. Vérifier les imports clés
-uv run python -c "import faiss; from langchain_community.vectorstores import FAISS; print('OK')"
+# 3. Vérifier les imports clés (faiss, FAISS, HuggingFaceEmbeddings, ChatMistralAI)
+uv run python scripts/check_imports.py
 ```
 
-> ⚠️ Ne jamais versionner le fichier `.env` ni les clés d'API.
+> Les secrets sont lus depuis `.env.local` (prioritaire) puis `.env`. Les deux sont ignorés par
+> Git : ⚠️ **ne jamais versionner** une clé d'API.
 
 ## Utilisation (vue d'ensemble — voir `docs/` pour le détail)
 
 ```bash
-# Récupérer les événements Open Agenda (étape 2)
-uv run python scripts/fetch_events.py
+# (diagnostic) explorer l'API Open Agenda et valider la connexion       [disponible]
+uv run python scripts/explore_openagenda.py
 
-# Construire l'index vectoriel FAISS (étape 3)
+# Récupérer les événements Open Agenda -> data/raw/events.json (étape 2) [disponible]
+uv run python scripts/fetch_events.py            # options : --city, --target-events, --per-agenda-max
+
+# Construire l'index vectoriel FAISS (étape 3)                           [à venir]
 uv run python scripts/build_index.py
 
-# Lancer l'API (étape 5)
-uv run uvicorn api.main:app --reload
-# → Swagger : http://localhost:8000/docs
+# Lancer l'API (étape 5)                                                 [à venir]
+uv run uvicorn api.main:app --reload             # → Swagger : http://localhost:8000/docs
 
-# Évaluer la qualité des réponses (étape 4/5)
+# Évaluer la qualité des réponses (étape 4/5)                            [à venir]
 uv run python scripts/evaluate_rag.py
 ```
 
@@ -93,4 +96,8 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 
 ## Statut
 
-🚧 POC en cours d'initialisation.
+🚧 POC en cours.
+- ✅ Étape 1 — environnement uv, imports clés vérifiés, clés API validées
+- ✅ Étape 2.1 — récupération Open Agenda (1500 événements Paris, multi-agendas)
+- ⏳ Étape 2.2/2.3 — nettoyage/structuration + tests unitaires
+- ⏳ Étapes 3 à 6 — index FAISS, chaîne RAG, API, conteneurisation

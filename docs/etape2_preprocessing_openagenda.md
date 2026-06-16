@@ -30,11 +30,13 @@ Choix de l'agenda/des agendas source(s) → cf. tâche 2.1 (à confirmer).
 
 ### 2.1 Récupération des données (API Open Agenda)
 - [x] Exploration API + validation de la stratégie par agendas (`scripts/explore_openagenda.py`)
-- [ ] Module `rag/data_loader.py` : client de l'API Open Agenda (auth par `OPENAGENDA_API_KEY`)
-- [ ] Script CLI `scripts/fetch_events.py` : télécharge les événements → `data/raw/events.json`
-- [ ] Gérer la **pagination** de l'API (récupérer l'ensemble des événements de la zone)
-- [ ] Filtrer par **localisation** (`EVENTS_CITY`, ex. Paris) et **période** (1 an d'historique + à venir, `< 1 an`)
-- [ ] (Optionnel) filtrer par **type d'événement** si pertinent pour la démo
+- [x] Module `rag/data_loader.py` : client `OpenAgendaClient` (auth `OPENAGENDA_API_KEY`, retries 429/5xx)
+- [x] Script CLI `scripts/fetch_events.py` : multi-agendas Paris → `data/raw/events.json` (paramétrable : `--city`, `--target-events`, `--per-agenda-max`…)
+- [x] **Pagination** via cursor `after` pour les événements **et** les agendas (l'`offset` est ignoré par `/agendas` — corrigé)
+- [x] Filtrage **localisation** (`location.city`, arrondissements « Paris 14 » captés) + **période** (`timings[gte]` = aujourd'hui − 12 mois, + à venir)
+- [x] Dédoublonnage par `uid` + plafond par agenda (`--per-agenda-max 300`) pour la diversité thématique
+- [N/A] Filtrage par **type d'événement** : non appliqué (on garde toutes les catégories pour un assistant culturel généraliste)
+- [x] **Résultat** : 1500 événements uniques, 16 agendas sources, 100 % localisés à Paris (`data/raw/events.json`)
 
 ### 2.2 Nettoyage et structuration (pandas)
 - [ ] Module `rag/preprocessing.py` : nettoyage + normalisation → DataFrame structuré
