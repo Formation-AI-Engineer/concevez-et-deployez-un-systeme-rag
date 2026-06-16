@@ -39,12 +39,12 @@ Choix de l'agenda/des agendas source(s) → cf. tâche 2.1 (à confirmer).
 - [x] **Résultat** : 1500 événements uniques, 16 agendas sources, 100 % localisés à Paris (`data/raw/events.json`)
 
 ### 2.2 Nettoyage et structuration (pandas)
-- [ ] Module `rag/preprocessing.py` : nettoyage + normalisation → DataFrame structuré
-- [ ] Sélection des **champs utiles** : titre, description, **date(s)**, **lieu**, ville, catégorie, URL
-- [ ] Gestion des **données manquantes / incorrectes** (descriptions vides, dates invalides → filtrées/imputées)
-- [ ] Construction d'un **texte d'événement** consolidé (titre + description + lieu + dates) pour la vectorisation
-- [ ] Conservation des **métadonnées** (date, lieu, catégorie, URL) à attacher à chaque document
-- [ ] Export propre → `data/processed/events.parquet` (+ aperçu CSV éventuel)
+- [x] Module `rag/preprocessing.py` : résolution multilingue (fr) + nettoyage HTML/entités/espaces → DataFrame
+- [x] Sélection des **champs utiles** (20 colonnes) : `title`, `description`, `long_description`, `keywords`, `date_range`, `date_start/end/next`, `location_name`, `address`, `city`, `postal_code`, `latitude/longitude`, `agenda_uid/title`, `slug`, `url`
+- [x] Gestion des **données manquantes** : champs vides → `""`, suppression des événements sans contenu (ni titre ni description), dédoublonnage par `uid`
+- [x] Construction d'un **texte consolidé** (`document`) : titre + description + long. desc. + « Quand » + « Lieu » + mots-clés (médiane ~1028 caractères)
+- [x] Métadonnées (date, lieu, coordonnées, agenda) conservées comme colonnes → attachables au `Document` LangChain (étape 3)
+- [x] Export → `data/processed/events.parquet` (1500 × 20) via `scripts/preprocess_events.py`
 
 ### 2.3 Tests unitaires (énoncé)
 - [ ] `tests/test_preprocessing.py` : schéma de sortie attendu (colonnes présentes, types corrects)
