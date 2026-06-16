@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environnement virtuel
+.venv/
+env/
+venv/
+
+# Secrets / config locale (ne jamais versionner la clé Mistral)
+.env
+*.local
+
+# Données Open Agenda (régénérables via les scripts de récupération)
+data/raw/
+data/processed/
+*.csv
+
+# Base vectorielle FAISS (reconstructible via scripts/build_index.py)
+vectorstore/*.faiss
+vectorstore/*.pkl
+vectorstore/index/
+
+# Caches de modèles d'embeddings (HuggingFace)
+.cache/
+
+# Rapports d'évaluation générés
+eval/reports/
+*.html.bak
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Docker
+*.pid
+
+# Artefacts Windows (flux de données alternatifs)
+*:Zone.Identifier
