@@ -40,6 +40,7 @@ def localized(value: Any, lang: str = "fr") -> str:
         for v in value.values():
             if v:
                 return str(v)
+        return ""  # dict multilingue vide / sans valeur exploitable
     return str(value)
 
 

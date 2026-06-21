@@ -47,10 +47,11 @@ Choix de l'agenda/des agendas source(s) → cf. tâche 2.1 (à confirmer).
 - [x] Export → `data/processed/events.parquet` (1500 × 20) via `scripts/preprocess_events.py`
 
 ### 2.3 Tests unitaires (énoncé)
-- [ ] `tests/test_preprocessing.py` : schéma de sortie attendu (colonnes présentes, types corrects)
-- [ ] Test du **filtrage période** (aucun événement > 1 an d'ancienneté)
-- [ ] Test du **filtrage localisation** (tous les événements dans la zone ciblée)
-- [ ] Test de la **gestion des valeurs manquantes** (pas de description/date nulle dans la sortie)
+- [x] `tests/test_preprocessing.py` : tests **purs** (fixtures) — résolution multilingue, nettoyage HTML/entités/espaces, schéma de sortie, texte consolidé, dédoublonnage, suppression des événements sans contenu
+- [x] `tests/test_fetch_events.py` : **filtrage localisation** — normalisation casse/accents, correspondance ville + arrondissements (« Paris 14 »), rejet des communes proches (« Parisot »)
+- [x] `tests/test_dataset.py` : validation du **parquet réellement produit** (ignoré si absent) — schéma/types, **période** (`date_end` ≥ borne `since`, ancrée sur la méta du JSON brut), **localisation** (toutes les villes dans la zone), **valeurs manquantes** (document non vide, `date_start`/`uid` présents, `uid` unique)
+- [x] **Bug corrigé** au passage : `localized({})` renvoyait `"{}"` (dict multilingue vide) → injectait du bruit dans 642 documents ; corrigé en `""`, parquet régénéré (médiane doc 1028 → 983 car.)
+- [x] Outillage : `conftest.py` (racine importable) + `scripts/__init__.py` ; **27 tests passent** (`uv run pytest`)
 
 ## Points de vigilance (énoncé)
 - Attention aux **données manquantes ou incorrectes**.
@@ -61,4 +62,4 @@ Choix de l'agenda/des agendas source(s) → cf. tâche 2.1 (à confirmer).
 - API Open Agenda ([documentation](https://developers.openagenda.com/)), `requests`, `pandas`.
 - Modèle NLP (embeddings) pour la vectorisation → étape 3.
 
-## Statut : À FAIRE
+## Statut : TERMINÉ
