@@ -69,8 +69,11 @@ uv run python scripts/explore_openagenda.py
 # Récupérer les événements Open Agenda -> data/raw/events.json (étape 2) [disponible]
 uv run python scripts/fetch_events.py            # options : --city, --target-events, --per-agenda-max
 
-# Construire l'index vectoriel FAISS (étape 3)                           [à venir]
+# Construire l'index vectoriel FAISS (étape 3)                          [disponible]
 uv run python scripts/build_index.py
+
+# Recherche sémantique en CLI dans l'index FAISS (test / démo)          [disponible]
+uv run python scripts/search.py "concert de jazz" -k 5
 
 # Lancer l'API (étape 5)                                                 [à venir]
 uv run uvicorn api.main:app --reload             # → Swagger : http://localhost:8000/docs
@@ -98,6 +101,6 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 
 🚧 POC en cours.
 - ✅ Étape 1 — environnement uv, imports clés vérifiés, clés API validées
-- ✅ Étape 2.1 — récupération Open Agenda (1500 événements Paris, multi-agendas)
-- ⏳ Étape 2.2/2.3 — nettoyage/structuration + tests unitaires
-- ⏳ Étapes 3 à 6 — index FAISS, chaîne RAG, API, conteneurisation
+- ✅ Étape 2 — récupération Open Agenda (1500 événements Paris, multi-agendas), nettoyage/structuration + tests unitaires
+- ✅ Étape 3 — chunking (4146 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche (44 tests OK)
+- ⏳ Étapes 4 à 6 — chaîne RAG (LangChain), API REST, conteneurisation
