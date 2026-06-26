@@ -54,6 +54,11 @@ class Settings:
     chunk_size: int = int(_get("CHUNK_SIZE", "800"))
     chunk_overlap: int = int(_get("CHUNK_OVERLAP", "100"))
     top_k: int = int(_get("TOP_K", "4"))
+    # Seuil de distance (cosinus) au-delà duquel un document récupéré est jugé non pertinent
+    # et écarté du contexte. Calibré empiriquement : requêtes culturelles ~0.4–0.8,
+    # requêtes hors-périmètre ~1.0+. Au-delà du seuil pour tous les docs → réponse honnête
+    # « aucun événement correspondant » sans appeler le LLM.
+    relevance_threshold: float = float(_get("RELEVANCE_THRESHOLD", "0.9"))
 
     log_level: str = _get("LOG_LEVEL", "INFO")
 

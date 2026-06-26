@@ -39,6 +39,13 @@ SYSTEM_PROMPT = (
 
 _HUMAN_PROMPT = "CONTEXTE :\n{context}\n\nQUESTION : {question}"
 
+# Réponse renvoyée lorsqu'aucun événement récupéré n'est pertinent (court-circuit avant LLM) :
+# garantit une réponse honnête et déterministe, et économise un appel API inutile.
+NO_MATCH_MESSAGE = (
+    "Je n'ai pas trouvé d'événement correspondant à votre demande. "
+    "Essayez de reformuler ou d'élargir vos critères (type d'événement, période, lieu)."
+)
+
 
 def _build_prompt() -> ChatPromptTemplate:
     """Construit le template de prompt (consigne système + contexte + question)."""
@@ -98,17 +105,42 @@ class RAGAnswer:
 class RAGAssistant:
     """Assistant RAG réutilisable : retriever FAISS + LLM Mistral orchestrés via LangChain."""
 
-    def __init__(self, vectorstore=None, llm=None, top_k: int | None = None) -> None:
+    def __init__(
+        self,
+        vectorstore=None,
+        llm=None,
+        top_k: int | None = None,
+        relevance_threshold: float | None = None,
+    ) -> None:
         self.vectorstore = vectorstore or load_vectorstore()
         self.top_k = top_k or settings.top_k
+        # Seuil de distance au-delà duquel un document est jugé non pertinent (cf. config).
+        self.relevance_threshold = (
+            settings.relevance_threshold if relevance_threshold is None else relevance_threshold
+        )
+        # Retriever LangChain « brut » (interface publique réutilisable par l'API étape 5).
         self.retriever = self.vectorstore.as_retriever(search_kwargs={"k": self.top_k})
         self.llm = llm or _build_llm()
         # Chaîne LCEL : prompt -> LLM -> texte brut. Le contexte est injecté dans answer().
         self.chain = _build_prompt() | self.llm | StrOutputParser()
 
+    def retrieve(self, question: str) -> list[Document]:
+        """Récupère les événements proches puis **écarte les non pertinents** par seuil de distance.
+
+        ``similarity_search_with_score`` renvoie la distance cosinus (plus petite = plus proche) ;
+        on ne conserve que les documents sous ``relevance_threshold``. Une requête hors-périmètre
+        (dont tous les voisins sont lointains) renvoie alors une liste vide, ce qui déclenche la
+        réponse honnête dans ``answer()``.
+        """
+        scored = self.vectorstore.similarity_search_with_score(question, k=self.top_k)
+        return [doc for doc, distance in scored if distance <= self.relevance_threshold]
+
     def answer(self, question: str) -> RAGAnswer:
-        """Répond à une question : recherche les événements, puis génère la réponse augmentée."""
-        docs = self.retriever.invoke(question)
+        """Répond à une question : recherche les événements pertinents, puis génère la réponse augmentée."""
+        docs = self.retrieve(question)
+        # Aucun document pertinent : réponse honnête, sans appeler le LLM (anti-hallucination).
+        if not docs:
+            return RAGAnswer(question=question, answer=NO_MATCH_MESSAGE, sources=[])
         context = _format_context(docs)
         answer = self.chain.invoke({"question": question, "context": context})
         return RAGAnswer(question=question, answer=answer, sources=docs)
