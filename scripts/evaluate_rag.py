@@ -157,7 +157,8 @@ def evaluate_pairs(pairs, assistant, embeddings, uid_to_title) -> list[PairResul
                 classification=classify(sim, cov, has_expected),
             )
         )
-        print(f"  [{i}/{len(pairs)}] {p['id']:32} sim={sim:.2f} cov={cov:.2f} -> {results[-1].classification}")
+        print(f"  [{i}/{len(pairs)}] {p['id']:32} sim={sim:.2f} cov={cov:.2f} "
+              f"-> {results[-1].classification}")
     return results
 
 
@@ -196,7 +197,6 @@ def compute_ragas(pairs, results, assistant) -> dict:
     try:
         _install_vertexai_shim()
         from ragas import EvaluationDataset, evaluate
-        from ragas.run_config import RunConfig
         from ragas.dataset_schema import SingleTurnSample
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.llms import LangchainLLMWrapper
@@ -206,6 +206,7 @@ def compute_ragas(pairs, results, assistant) -> dict:
             LLMContextRecall,
             ResponseRelevancy,
         )
+        from ragas.run_config import RunConfig
     except Exception as exc:  # import cassé (ex. conflit langchain_community) ou absent
         return {"available": False, "reason": f"import ragas impossible : {exc}"}
 
@@ -314,8 +315,11 @@ def write_reports(summary, results, ragas, out_dir: Path, stamp: str) -> tuple[P
         "|---|---|---|",
     ]
     for c in ("correcte", "partielle", "incorrecte"):
-        lignes.append(f"| {c} | {summary['classification'][c]} | {summary['classification_taux'][c]} |")
-    lignes += ["", "## Par catégorie", "", "| Catégorie | n | Sim. moy. | Taux correctes |", "|---|---|---|---|"]
+        lignes.append(
+            f"| {c} | {summary['classification'][c]} | {summary['classification_taux'][c]} |"
+        )
+    lignes += ["", "## Par catégorie", "",
+               "| Catégorie | n | Sim. moy. | Taux correctes |", "|---|---|---|---|"]
     for cat, d in summary["par_categorie"].items():
         lignes.append(f"| {cat} | {d['n']} | {d['similarite_moyenne']} | {d['taux_correctes']} |")
 
@@ -332,7 +336,8 @@ def write_reports(summary, results, ragas, out_dir: Path, stamp: str) -> tuple[P
                "| id | catégorie | sim | couv | classe |", "|---|---|---|---|---|"]
     for r in results:
         lignes.append(
-            f"| {r.id} | {r.category} | {r.semantic_similarity} | {r.key_info_coverage} | {r.classification} |"
+            f"| {r.id} | {r.category} | {r.semantic_similarity} "
+            f"| {r.key_info_coverage} | {r.classification} |"
         )
     md_path.write_text("\n".join(lignes) + "\n", encoding="utf-8")
     return json_path, md_path

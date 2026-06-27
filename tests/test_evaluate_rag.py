@@ -18,7 +18,6 @@ from scripts.evaluate_rag import (
     key_info_coverage,
 )
 
-
 # --- Exact Match / normalisation -----------------------------------------------
 
 def test_exact_match_ignore_casse_accents_ponctuation():

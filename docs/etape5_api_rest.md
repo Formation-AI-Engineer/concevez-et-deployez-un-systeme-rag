@@ -43,9 +43,11 @@ vectorielle.
   - [x] `/ask` question vide / champ manquant → `422` ; sans assistant → `503` ; erreur LLM → `500` sans fuite
   - [x] `/rebuild` : désactivé sans jeton → `503` ; jeton manquant → `401` ; jeton valide → `200`
 
-### 5.5 Évaluation automatisée (énoncé — Ragas en CI)
-- [ ] `scripts/evaluate_rag.py` (étape 4.4) intégrable dans un pipeline (script / GitHub Actions)
-- [ ] (Optionnel) workflow `.github/workflows/ci.yml` : `pytest` + lint `ruff` + évaluation Ragas
+### 5.5 Évaluation automatisée (énoncé — Ragas en CI) ✅
+- [x] Workflow `.github/workflows/ci.yml` — job **`quality`** (push/PR) : `ruff check .` + `pytest` via `uv`, avec cache des modèles HuggingFace
+- [x] `scripts/evaluate_rag.py` intégré dans un job **`evaluate`** (déclenchement manuel `workflow_dispatch`) : `build_index` + évaluation sur échantillon, clé Mistral via `secrets.MISTRAL_API_KEY`, rapport publié en artefact
+- [x] Job `evaluate` **non bloquant** (`continue-on-error`) + garde si les données (non versionnées) sont absentes — le CL `quality` reste le cœur exécuté à chaque commit
+- ℹ️ Prérequis CI vérifié : aucun test n'exige de clé Mistral (assistant mocké / `FakeListChatModel`) ni l'index réel (tests `skipif` index absent) → la CI passe sans secret
 
 ## Points de vigilance (énoncé)
 - **Séparer** logique métier et code d'API ; **documenter** chaque route (entrées/sorties).
@@ -59,4 +61,4 @@ vectorielle.
 - FastAPI + Uvicorn (Swagger UI auto), Pydantic, `httpx` (tests), Ragas (évaluation).
 - [FastAPI Quickstart](https://fastapi.tiangolo.com/), [Ragas](https://docs.ragas.io/).
 
-## Statut : EN COURS (5.1 à 5.4 faites ; 5.5 CI optionnelle à faire)
+## Statut : FAIT (5.1 API, 5.2 endpoints, 5.3 erreurs, 5.4 tests, 5.5 CI lint+tests+éval)

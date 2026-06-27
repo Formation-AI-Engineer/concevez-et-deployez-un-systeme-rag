@@ -136,7 +136,7 @@ class RAGAssistant:
         return [doc for doc, distance in scored if distance <= self.relevance_threshold]
 
     def answer(self, question: str) -> RAGAnswer:
-        """Répond à une question : recherche les événements pertinents, puis génère la réponse augmentée."""
+        """Répond à une question : recherche les événements pertinents puis génère la réponse."""
         docs = self.retrieve(question)
         # Aucun document pertinent : réponse honnête, sans appeler le LLM (anti-hallucination).
         if not docs:

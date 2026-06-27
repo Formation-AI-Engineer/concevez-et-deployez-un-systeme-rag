@@ -50,7 +50,9 @@ class Settings:
 
     # --- Chemins (résolus en absolu depuis la racine) ---
     raw_data_path: Path = ROOT_DIR / _get("RAW_DATA_PATH", "data/raw/events.json")
-    processed_data_path: Path = ROOT_DIR / _get("PROCESSED_DATA_PATH", "data/processed/events.parquet")
+    processed_data_path: Path = ROOT_DIR / _get(
+        "PROCESSED_DATA_PATH", "data/processed/events.parquet"
+    )
     vectorstore_dir: Path = ROOT_DIR / _get("VECTORSTORE_DIR", "vectorstore/index")
 
     # --- Paramètres RAG ---

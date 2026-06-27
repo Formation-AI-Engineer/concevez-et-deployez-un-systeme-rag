@@ -42,9 +42,11 @@ def check_key() -> None:
 
 def check_global_search_restricted() -> None:
     print("2) Recherche globale d'événements /v2/events (attendu : 403 restreint)")
-    r = requests.get(f"{API}/events",
-                     params={"key": settings.openagenda_api_key, "size": 1, "search": settings.events_city},
-                     timeout=TIMEOUT)
+    r = requests.get(
+        f"{API}/events",
+        params={"key": settings.openagenda_api_key, "size": 1, "search": settings.events_city},
+        timeout=TIMEOUT,
+    )
     print(f"   HTTP {r.status_code} -> on ne peut pas requêter tous les événements d'un coup."
           " Stratégie : passer par les agendas.\n")
 

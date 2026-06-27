@@ -54,7 +54,8 @@ def _show(assistant: RAGAssistant, question: str, expected: list[int] | None = N
         vus.add(uid)
         uids_recus.append(uid)
         print(f"   [{uid}] {m.get('title')}")
-        print(f"         {m.get('date_range')} | {m.get('location_name')} | {m.get('agenda_title')}")
+        print(f"         {m.get('date_range')} | {m.get('location_name')} "
+              f"| {m.get('agenda_title')}")
 
     if expected is not None:
         # Invariant d'ancrage : chaque uid annoté DOIT être récupéré par la question.
@@ -70,9 +71,9 @@ def _show(assistant: RAGAssistant, question: str, expected: list[int] | None = N
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Réimprime les faits ancrant le jeu de test RAG (4.3).")
-    parser.add_argument("-q", "--question", help="Interroge une requête ponctuelle au lieu du dataset.")
-    parser.add_argument("-k", "--top-k", type=int, default=4, help="Nombre de voisins récupérés (défaut 4).")
+    parser = argparse.ArgumentParser(description="Réimprime les faits du jeu de test (4.3).")
+    parser.add_argument("-q", "--question", help="Interroge une requête ponctuelle hors dataset.")
+    parser.add_argument("-k", "--top-k", type=int, default=4, help="Nombre de voisins (défaut 4).")
     args = parser.parse_args()
 
     assistant = _build_assistant(args.top_k)

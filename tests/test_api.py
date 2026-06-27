@@ -143,8 +143,12 @@ def test_ask_erreur_llm_renvoie_500_sans_fuite(client):
 
 # --- /rebuild (protégé) --------------------------------------------------------
 
-def test_rebuild_desactive_si_aucun_jeton(client):
-    """Sans jeton configuré côté serveur, l'endpoint est refusé (503)."""
+def test_rebuild_desactive_si_aucun_jeton(client, monkeypatch):
+    """Sans jeton configuré côté serveur, l'endpoint est refusé (503).
+
+    On force `api_rebuild_token=None` pour ne pas dépendre de l'environnement (.env.local / CI).
+    """
+    monkeypatch.setattr(main, "settings", types.SimpleNamespace(api_rebuild_token=None))
     r = client.post("/rebuild")
     assert r.status_code == 503
 
