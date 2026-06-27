@@ -34,6 +34,9 @@ class Settings:
     # --- Secrets ---
     mistral_api_key: str | None = _get("MISTRAL_API_KEY")
     openagenda_api_key: str | None = _get("OPENAGENDA_API_KEY")
+    # Jeton protégeant l'endpoint sensible POST /rebuild (étape 5.2). Si non défini, l'endpoint
+    # est désactivé (refus) : on n'expose jamais une reconstruction non authentifiée.
+    api_rebuild_token: str | None = _get("API_REBUILD_TOKEN")
 
     # --- Modèles ---
     mistral_model: str = _get("MISTRAL_MODEL", "mistral-small-latest")

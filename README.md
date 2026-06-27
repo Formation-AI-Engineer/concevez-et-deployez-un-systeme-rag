@@ -75,12 +75,59 @@ uv run python scripts/build_index.py
 # Recherche sémantique en CLI dans l'index FAISS (test / démo)          [disponible]
 uv run python scripts/search.py "concert de jazz" -k 5
 
-# Lancer l'API (étape 5)                                                 [à venir]
+# Lancer l'API REST (étape 5) — voir section dédiée ci-dessous          [disponible]
 uv run uvicorn api.main:app --reload             # → Swagger : http://localhost:8000/docs
 
-# Évaluer la qualité des réponses (étape 4/5)                            [à venir]
-uv run python scripts/evaluate_rag.py
+# Évaluer la qualité des réponses (étape 4/5)                            [disponible]
+uv run python scripts/evaluate_rag.py            # options : --sample N, --no-ragas
 ```
+
+## Lancer l'API REST
+
+L'API expose le système RAG en HTTP. Elle peut être lancée **seule**, à condition que l'index
+FAISS existe et que la clé Mistral soit configurée.
+
+**Prérequis**
+1. Dépendances installées : `uv sync` (cf. *Installation*).
+2. Secrets dans `.env.local` : au minimum `MISTRAL_API_KEY` (génération des réponses).
+   Optionnel : `API_REBUILD_TOKEN` pour activer l'endpoint `/rebuild`.
+3. **Index FAISS construit** (sinon `/health` répond `degraded` et `/ask` renvoie `503`) :
+   ```bash
+   uv run python scripts/build_index.py        # crée vectorstore/index/
+   ```
+
+**Démarrage**
+```bash
+uv run uvicorn api.main:app --reload           # http://127.0.0.1:8000
+```
+La documentation interactive **Swagger** est servie sur <http://127.0.0.1:8000/docs>
+(la racine `/` y redirige automatiquement).
+
+**Endpoints**
+
+| Méthode & route | Description |
+|---|---|
+| `GET /health`   | État du service + nombre d'événements indexés |
+| `POST /ask`     | `{ "question": "..." }` → `{ "question", "answer", "sources": [...] }` |
+| `POST /rebuild` | Reconstruit l'index FAISS (protégé par jeton `X-API-Token`) |
+
+**Exemples**
+```bash
+# État du service
+curl http://127.0.0.1:8000/health
+
+# Poser une question
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Quels concerts de jazz puis-je voir à Paris ?"}'
+
+# Reconstruire l'index (nécessite API_REBUILD_TOKEN dans .env.local)
+curl -X POST http://127.0.0.1:8000/rebuild -H "X-API-Token: <votre-jeton>"
+```
+
+> **Codes d'erreur** : `422` question vide ou champ manquant · `503` assistant non chargé
+> (index absent) · `401` jeton `/rebuild` invalide · `500` erreur de génération (le détail est
+> journalisé côté serveur, jamais renvoyé au client).
 
 ## Documentation
 
@@ -102,5 +149,7 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 🚧 POC en cours.
 - ✅ Étape 1 — environnement uv, imports clés vérifiés, clés API validées
 - ✅ Étape 2 — récupération Open Agenda (1500 événements Paris, multi-agendas), nettoyage/structuration + tests unitaires
-- ✅ Étape 3 — chunking (4146 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche (44 tests OK)
-- ⏳ Étapes 4 à 6 — chaîne RAG (LangChain), API REST, conteneurisation
+- ✅ Étape 3 — chunking (4146 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche
+- ✅ Étape 4 — chaîne RAG LangChain (FAISS + Mistral), gating de pertinence, jeu de test annoté, évaluation (métriques locales + Ragas)
+- ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (78 tests OK)
+- ⏳ Étape 6 — conteneurisation Docker & démo

@@ -47,6 +47,11 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.flake8-bugbear]
+# `Depends`/`Header`/`Query` dans les défauts d'arguments est l'idiome standard de FastAPI
+# (injection de dépendances), pas le piège mutable que vise B008.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Header", "fastapi.Query"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v"
