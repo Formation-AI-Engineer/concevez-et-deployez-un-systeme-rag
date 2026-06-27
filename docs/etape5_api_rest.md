@@ -45,8 +45,10 @@ vectorielle.
 
 ### 5.5 Évaluation automatisée (énoncé — Ragas en CI) ✅
 - [x] Workflow `.github/workflows/ci.yml` — job **`quality`** (push/PR) : `ruff check .` + `pytest` via `uv`, avec cache des modèles HuggingFace
-- [x] `scripts/evaluate_rag.py` intégré dans un job **`evaluate`** (déclenchement manuel `workflow_dispatch`) : `build_index` + évaluation sur échantillon, clé Mistral via `secrets.MISTRAL_API_KEY`, rapport publié en artefact
-- [x] Job `evaluate` **non bloquant** (`continue-on-error`) + garde si les données (non versionnées) sont absentes — le CL `quality` reste le cœur exécuté à chaque commit
+- [x] `scripts/evaluate_rag.py` intégré dans un job **`evaluate`** (déclenchement manuel `workflow_dispatch`) : **pipeline complet** `fetch_events` → `preprocess_events` → `build_index` → évaluation sur échantillon, secrets `OPENAGENDA_API_KEY` + `MISTRAL_API_KEY`, rapport publié en artefact
+- [x] Job `evaluate` **non bloquant** (`continue-on-error`) + garde si les secrets sont absents — le job `quality` reste le cœur exécuté à chaque commit
+- ⚠️ Le job récupère un **instantané frais réduit** (≈300 événements) : distinct de l'index local sur lequel `qa_dataset.json` est ancré → les métriques de couverture/ancrage peuvent différer du run local (le job valide surtout l'exécution **de bout en bout** + métriques sémantiques/Ragas)
+- 💡 `workflow_dispatch` n'est disponible **que depuis la branche par défaut** (`main`) : le workflow doit y être présent pour que le bouton « Run workflow » apparaisse
 - ℹ️ Prérequis CI vérifié : aucun test n'exige de clé Mistral (assistant mocké / `FakeListChatModel`) ni l'index réel (tests `skipif` index absent) → la CI passe sans secret
 
 ## Points de vigilance (énoncé)
