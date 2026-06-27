@@ -18,34 +18,36 @@ vectorielle.
 
 ## Tâches
 
-### 5.1 Application FastAPI
-- [ ] Module `api/main.py` : instance FastAPI + métadonnées (titre, description, version)
-- [ ] **Chargement au démarrage** (`lifespan`) de l'index FAISS + assistant RAG **une seule fois** (pas par requête)
-- [ ] Séparer **logique métier** (`rag/`) du **code d'API** (`api/`) — l'API importe `RAGAssistant`
+### 5.1 Application FastAPI ✅
+- [x] Module `api/main.py` : instance FastAPI + métadonnées (titre, description, version 1.0.0)
+- [x] **Chargement au démarrage** (`lifespan`) de l'index FAISS + assistant RAG **une seule fois**, rangé dans `app.state` (démarrage gracieux si index absent → `/health` `degraded`)
+- [x] Logique métier (`rag/`) séparée du code d'API (`api/`) ; schémas Pydantic isolés dans `api/schemas.py` ; l'API importe `RAGAssistant`
 
-### 5.2 Endpoints
-- [ ] `GET /` → redirection vers Swagger (`/docs`) ; `GET /health` → état du service
-- [ ] `POST /ask` : corps `{ "question": "..." }` → `{ "answer": "...", "sources": [...] }`
-  - [ ] Schéma d'entrée/sortie **Pydantic** (`AskRequest` / `AskResponse`)
-  - [ ] Inclure les **sources** (titre, date, lieu, URL) dans la réponse
-- [ ] `POST /rebuild` : reconstruit l'index FAISS depuis `data/processed/` et recharge l'assistant
-  - [ ] **Protéger** l'endpoint sensible (clé/token simple, même pour un POC)
+### 5.2 Endpoints ✅
+- [x] `GET /` → redirection vers Swagger (`/docs`) ; `GET /health` → état du service + nb d'événements indexés
+- [x] `POST /ask` : corps `{ "question": "..." }` → `{ "question", "answer", "sources": [...] }`
+  - [x] Schémas **Pydantic** `AskRequest` / `AskResponse` (+ `SourceEvent`) dans `api/schemas.py`
+  - [x] **Sources** (uid, titre, date, lieu, URL) incluses ; **dédoublonnées par uid** (chunking) et lieu nettoyé ("Paris Paris" → "Paris")
+- [x] `POST /rebuild` : reconstruit l'index FAISS (`build_and_save`) depuis `data/processed/` et recharge l'assistant dans `app.state`
+  - [x] **Protégé** par jeton `API_REBUILD_TOKEN` (en-tête `X-API-Token`, comparaison à temps constant) ; désactivé si non configuré
 
-### 5.3 Gestion des erreurs
-- [ ] Question **vide** / champ manquant → `422` (validation Pydantic)
-- [ ] Erreur d'inférence / LLM indisponible → `500` avec message clair
-- [ ] Ne **jamais exposer** d'informations sensibles (clés d'API) dans les réponses/erreurs
+### 5.3 Gestion des erreurs ✅
+- [x] Question **vide** / champ manquant → `422` (validation Pydantic + `field_validator`)
+- [x] Erreur d'inférence / LLM indisponible → `500` avec message **générique** (détail journalisé côté serveur uniquement)
+- [x] Aucune info sensible exposée ; assistant non chargé → `503` ; jeton invalide → `401`
 
-### 5.4 Tests fonctionnels (énoncé)
-- [ ] `tests/test_api.py` (via `httpx` / `TestClient`) :
-  - [ ] `/health` répond `200`
-  - [ ] `/ask` avec question valide → `200` + champ `answer` non vide
-  - [ ] `/ask` avec question vide → `422`
-  - [ ] (mock LLM/retriever pour des tests rapides et déterministes)
+### 5.4 Tests fonctionnels (énoncé) ✅
+- [x] `tests/test_api.py` (via `TestClient`, assistant **mocké** → rapide et déterministe) :
+  - [x] `/health` `200` (ok / degraded) ; `/` redirige vers `/docs`
+  - [x] `/ask` question valide → `200` + `answer` non vide + sources dédoublonnées
+  - [x] `/ask` question vide / champ manquant → `422` ; sans assistant → `503` ; erreur LLM → `500` sans fuite
+  - [x] `/rebuild` : désactivé sans jeton → `503` ; jeton manquant → `401` ; jeton valide → `200`
 
-### 5.5 Évaluation automatisée (énoncé — Ragas en CI)
-- [ ] `scripts/evaluate_rag.py` (étape 4.4) intégrable dans un pipeline (script / GitHub Actions)
-- [ ] (Optionnel) workflow `.github/workflows/ci.yml` : `pytest` + lint `ruff` + évaluation Ragas
+### 5.5 Évaluation automatisée (énoncé — Ragas en CI) ✅
+- [x] Workflow `.github/workflows/ci.yml` — job **`quality`** (push/PR) : `ruff check .` + `pytest` via `uv`, avec cache des modèles HuggingFace
+- [x] `scripts/evaluate_rag.py` intégré dans un job **`evaluate`** (déclenchement manuel `workflow_dispatch`) : `build_index` + évaluation sur échantillon, clé Mistral via `secrets.MISTRAL_API_KEY`, rapport publié en artefact
+- [x] Job `evaluate` **non bloquant** (`continue-on-error`) + garde si les données (non versionnées) sont absentes — le CL `quality` reste le cœur exécuté à chaque commit
+- ℹ️ Prérequis CI vérifié : aucun test n'exige de clé Mistral (assistant mocké / `FakeListChatModel`) ni l'index réel (tests `skipif` index absent) → la CI passe sans secret
 
 ## Points de vigilance (énoncé)
 - **Séparer** logique métier et code d'API ; **documenter** chaque route (entrées/sorties).
@@ -59,4 +61,4 @@ vectorielle.
 - FastAPI + Uvicorn (Swagger UI auto), Pydantic, `httpx` (tests), Ragas (évaluation).
 - [FastAPI Quickstart](https://fastapi.tiangolo.com/), [Ragas](https://docs.ragas.io/).
 
-## Statut : À FAIRE
+## Statut : FAIT (5.1 API, 5.2 endpoints, 5.3 erreurs, 5.4 tests, 5.5 CI lint+tests+éval)

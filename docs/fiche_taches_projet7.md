@@ -11,6 +11,7 @@ avec Docker, pour **Puls-Events**.
 | Document | Description |
 |----------|-------------|
 | [`contexte_general.md`](contexte_general.md) | Contexte métier, mission Jérémy, stack, livrables, vigilance |
+| [`points_mentor.md`](points_mentor.md) | Problèmes, contraintes & questions rencontrés (à présenter au mentor) |
 | [`etape1_configuration_environnement.md`](etape1_configuration_environnement.md) | Environnement uv reproductible + imports clés + secrets + structure |
 | [`etape2_preprocessing_openagenda.md`](etape2_preprocessing_openagenda.md) | Récupération + filtrage + nettoyage des données Open Agenda |
 | [`etape3_base_vectorielle_faiss.md`](etape3_base_vectorielle_faiss.md) | Chunking + embeddings + index FAISS + recherche sémantique |

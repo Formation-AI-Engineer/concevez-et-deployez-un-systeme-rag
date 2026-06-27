@@ -15,26 +15,29 @@ Indexer les descriptions des événements sous forme de **vecteurs** dans une ba
 ## Tâches
 
 ### 3.1 Découpage en chunks
-- [ ] Module `rag/chunking.py` : `RecursiveCharacterTextSplitter` (LangChain), `CHUNK_SIZE` / `CHUNK_OVERLAP` (`.env`)
-- [ ] Conversion des événements en `Document` LangChain : `page_content` (texte) + `metadata` (date, lieu, catégorie, URL, id)
-- [ ] Stratégie : 1 événement = 1+ chunks selon la longueur de la description (garder l'id événement en métadonnée)
+- [x] Module `rag/chunking.py` : `RecursiveCharacterTextSplitter` (LangChain), `CHUNK_SIZE` / `CHUNK_OVERLAP` (`.env`)
+- [x] Conversion des événements en `Document` LangChain : `page_content` (texte) + `metadata` (date, lieu, catégorie, URL, id)
+- [x] Stratégie : 1 événement = 1+ chunks selon la longueur de la description (`uid` + `chunk`/`n_chunks` en métadonnée)
+- [x] **Résultat** : 1500 événements → **4146 chunks** (~2.76/événement, max 16) ; 100 % des `uid` couverts
 
 ### 3.2 Embeddings
-- [ ] Module `rag/embeddings.py` : `HuggingFaceEmbeddings` (modèle multilingue `EMBEDDING_MODEL`, exécuté en local)
-- [ ] Modèle d'embeddings **chargé une seule fois** (réutilisé par l'indexation et l'API)
-- [ ] (Note) embeddings HuggingFace privilégiés pour rester local/gratuit ; alternative Mistral embeddings documentée
+- [x] Module `rag/embeddings.py` : `HuggingFaceEmbeddings` (modèle multilingue `EMBEDDING_MODEL`, exécuté en local, CPU)
+- [x] Modèle d'embeddings **chargé une seule fois** (`@functools.cache`, réutilisé par l'indexation et l'API)
+- [x] Vecteurs **normalisés** (norme 1, dim 384) → distance L2 ≈ cosinus
+- [x] (Note) embeddings HuggingFace privilégiés pour rester local/gratuit ; alternative `mistral-embed` documentée
 
 ### 3.3 Indexation FAISS
-- [ ] Module `rag/vectorstore.py` : construction `FAISS.from_documents(...)` + `save_local(VECTORSTORE_DIR)`
-- [ ] Script CLI `scripts/build_index.py` : (re)construit l'index depuis `data/processed/` → `vectorstore/index/`
-- [ ] Persistance de l'index + métadonnées (`index.faiss` + `index.pkl`)
-- [ ] Choix de l'index FAISS adapté (Flat L2 / cosine pour un POC ; documenter le choix vs IVF pour le passage à l'échelle)
+- [x] Module `rag/vectorstore.py` : `FAISS.from_documents(...)` (`DistanceStrategy.COSINE`) + `save_local`/`load_local`
+- [x] Script CLI `scripts/build_index.py` : (re)construit l'index depuis `data/processed/` → `vectorstore/index/`
+- [x] Persistance de l'index + métadonnées (`index.faiss` 6.4 Mo + `index.pkl` 3.2 Mo)
+- [x] Choix `IndexFlatL2` (exact, rappel 100 % pour le POC) ; bascule IVF/HNSW documentée pour le passage à l'échelle
 
 ### 3.4 Tests de recherche & unitaires (énoncé)
-- [ ] `tests/test_vectorstore.py` : l'index se charge et contient le nombre attendu de vecteurs
-- [ ] Test de **recherche sémantique** : une requête connue renvoie l'événement pertinent dans le top-k
-- [ ] Vérifier que **tous les événements** ont bien été indexés (comptage chunks vs documents)
-- [ ] Vérifier la **présence des métadonnées** dans les résultats de recherche
+- [x] `tests/test_vectorstore.py` : l'index se charge et contient le nombre attendu de vecteurs (4146)
+- [x] Test de **recherche sémantique** : une requête connue renvoie l'événement pertinent dans le top-k
+- [x] Vérifier que **tous les événements** ont bien été indexés (1500 `uid` index == parquet)
+- [x] Vérifier la **présence des métadonnées** dans les résultats de recherche
+- [x] + round-trip build → save → load sur corpus synthétique ; **44 tests passent** au total (`uv run pytest`)
 
 ## Points de vigilance (énoncé)
 - **Optimiser** l'index pour des recherches rapides (bon algorithme FAISS).
@@ -46,4 +49,4 @@ Indexer les descriptions des événements sous forme de **vecteurs** dans une ba
 - FAISS (indexation vectorielle), LangChain (interface FAISS), HuggingFace embeddings.
 - [Faiss Index Guide](https://github.com/facebookresearch/faiss/wiki).
 
-## Statut : À FAIRE
+## Statut : TERMINÉ
