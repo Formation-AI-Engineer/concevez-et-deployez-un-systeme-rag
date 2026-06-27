@@ -29,10 +29,10 @@ et de générer des **réponses augmentées** à partir des données indexées d
 - [x] Inclure dans la réponse les **infos clés** (titre, date, lieu, mots-clés, lien) via `_format_event` (métadonnées injectées dans le contexte du LLM)
 - [x] Tester plusieurs **scénarios d'interaction** : `tests/test_chain.py` (hermétique, doublures vectorstore + `FakeListChatModel`) couvre seuil, réponse honnête, traçabilité des sources, scénarios enchaînés
 
-### 4.3 Jeu de test annoté (livrable)
-- [ ] `eval/qa_dataset.json` : questions/réponses de référence **annotées par l'humain** (≥ 15–20 paires)
-- [ ] Couvrir des cas variés : type d'événement, lieu, période, question hors-périmètre
-- [ ] Documenter la **méthode d'annotation** (réponses fondées sur les données réellement indexées)
+### 4.3 Jeu de test annoté (livrable) ✅
+- [x] `eval/qa_dataset.json` : **20 paires** question/réponse annotées, chaque réponse fondée sur les événements réellement récupérés via `RAGAssistant.retrieve()` (uid tracés dans `expected_event_uids`)
+- [x] Cas variés : `type_evenement` (×10), `lieu` (×5), `periode` (×2), `hors_perimetre` (×3, dont un refus malgré récupération)
+- [x] **Méthode d'annotation documentée** dans `eval/README.md` ; validation automatique `tests/test_qa_dataset.py` (schéma, couverture, ancrage réel des uid dans l'index)
 
 ### 4.4 Évaluation de la qualité (énoncé)
 - [ ] Script `scripts/evaluate_rag.py` : compare les réponses générées au jeu annoté
@@ -49,4 +49,4 @@ et de générer des **réponses augmentées** à partir des données indexées d
 - LangChain (orchestration), Mistral (génération), Ragas (évaluation automatique).
 - [LangChain Documentation](https://python.langchain.com/), Mistral Model docs.
 
-## Statut : EN COURS (4.1 + 4.2 faites ; restent 4.3 jeu de test, 4.4 évaluation)
+## Statut : EN COURS (4.1 + 4.2 + 4.3 faites ; reste 4.4 évaluation)

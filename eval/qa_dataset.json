@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "description": "Jeu de test annoté par l'humain pour l'évaluation du système RAG (étape 4.3). Chaque réponse de référence est fondée sur les événements RÉELLEMENT indexés dans FAISS (vectorstore/index/), retrouvés via RAGAssistant.retrieve().",
+    "source": "data/processed/events.parquet (1500 événements culturels parisiens, Open Agenda)",
+    "n_pairs": 20,
+    "relevance_threshold": 0.9,
+    "annotation_method": "Voir eval/README.md. Pour chaque question, on interroge le retriever, on lit les événements réellement récupérés (titre, date, lieu) et on rédige à la main une réponse de référence n'utilisant que ces faits. expected_event_uids liste les uid pertinents retrouvés ; expects_no_match=true quand le seuil écarte tout document ; expects_refusal=true quand des documents remontent mais qu'aucun ne répond réellement à la question.",
+    "annotated_on": "2026-06-26",
+    "categories": ["type_evenement", "lieu", "periode", "hors_perimetre"]
+  },
+  "pairs": [
+    {
+      "id": "type-jazz",
+      "category": "type_evenement",
+      "question": "Quels concerts de jazz puis-je voir à Paris ?",
+      "reference_answer": "Plusieurs concerts de jazz sont proposés : le festival international Jazzycolors (27 octobre - 9 décembre 2025), le Concert de la Saint-Jean à l'église Saint-Nicolas des Champs (mercredi 24 juin, 20h30) et « Jazz au Café Maa n°4 » avec Aki Rissanen et Dominique Pifarély à l'Institut finlandais (jeudi 30 avril, 20h00).",
+      "expected_event_uids": [47475785, 93449035, 53076575],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-exposition",
+      "category": "type_evenement",
+      "question": "Je cherche une exposition à voir.",
+      "reference_answer": "Deux expositions sont à l'affiche : « Frontière », prolongée à la Cité des sciences et de l'Industrie (3 juin - 1 septembre), et « La condition extra-terrestre » de l'Observatoire de l'Espace du CNES au Centre Wallonie-Bruxelles (12 - 27 septembre 2025).",
+      "expected_event_uids": [95415032, 72321187],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-orgue-sacree",
+      "category": "type_evenement",
+      "question": "Y a-t-il des concerts d'orgue ou de musique sacrée ?",
+      "reference_answer": "Oui : L'Heure d'Orgue de Saint-Gervais (certains samedis du 4 octobre 2025 au 4 juillet 2026), le Concert « Thanda Choir » à l'église Saint-Eustache (vendredi 5 juin, 20h30) et le Concert des Talas à l'église Saint-Jacques du Haut-Pas (mardi 23 juin, 20h00).",
+      "expected_event_uids": [35702254, 23655695, 29562423],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-cinema",
+      "category": "type_evenement",
+      "question": "Quelles séances de cinéma sont proposées ?",
+      "reference_answer": "Le Centre Wallonie-Bruxelles programme plusieurs films dans sa salle de cinéma : « Nino dans la nuit » de Laurent Micheli (lundi 23 février, 19h30), « Les filles du ciel » de Bérangère McNeese (lundi 16 mars, 20h00) et « Sainte-Marie-aux-Mines » de Claude Schmitz (lundi 26 janvier, 20h00). Le Festival du film taïwanais a aussi lieu à La Filmothèque du Quartier Latin (1 - 10 avril).",
+      "expected_event_uids": [74504684, 46594023, 20127806, 5542474],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-danse",
+      "category": "type_evenement",
+      "question": "Je voudrais assister à un spectacle de danse.",
+      "reference_answer": "Plusieurs spectacles de danse sont proposés : « BôL - Flamenco et kathak » au Théâtre Mandapa (vendredi 24 avril, 20h30), la Soirée Rhizome #Danse au Centre Wallonie-Bruxelles (jeudi 19 mars, 20h00) et le spectacle « Je_Burnt Offering » au Centre Culturel Coréen (vendredi 21 novembre 2025, 19h00).",
+      "expected_event_uids": [31223498, 83028451, 36354350],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-conference-spiritualite",
+      "category": "type_evenement",
+      "question": "Y a-t-il des conférences ou rencontres sur la spiritualité ?",
+      "reference_answer": "Oui, notamment au Collège des Bernardins : « Burn-out, dépression, désolation spirituelle : distinguer pour mieux accompagner » (samedi 21 novembre, 09h30) et le « Dialogue judéo-chrétien sur la crise écologique » (jeudi 11 juin, 19h00). Les Fraternités de Jérusalem proposent aussi une retraite de rentrée à l'église Saint-Gervais (21 septembre - 15 octobre).",
+      "expected_event_uids": [19948450, 20208717, 96676928],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-sciences",
+      "category": "type_evenement",
+      "question": "Des activités pour découvrir les sciences ?",
+      "reference_answer": "La Cité des sciences et de l'Industrie propose l'exposition « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025). Le Festival Double•Science se tient par ailleurs au Ground Control, à Paris (12 et 13 juin).",
+      "expected_event_uids": [10789521, 59963599],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-dedicace-litterature",
+      "category": "type_evenement",
+      "question": "Une rencontre ou dédicace avec un auteur ?",
+      "reference_answer": "Le Collège des Bernardins propose un cycle de rencontres autour d'œuvres classiques, le lundi à 12h45 : « Tartuffe » de Molière (15 juin), « Tobie des Marais » de Sylvie Germain (18 mai), « Jacques le Fataliste » de Diderot (23 mars) et « Mémoires d'une jeune fille rangée » de Simone de Beauvoir (9 mars).",
+      "expected_event_uids": [48000437, 68732973, 76618150, 80488536],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-musique-classique",
+      "category": "type_evenement",
+      "question": "Un concert de musique classique ?",
+      "reference_answer": "Le Collège des Bernardins propose « Mozart : Requiem et Symphonie n°3 » (mardi 2 décembre 2025, 20h00). On peut aussi écouter L'Heure d'Orgue de Saint-Gervais (certains samedis) et le Concert « Faites de la musique ! » à Saint-Pierre de Montmartre (dimanche 21 juin, 14h00).",
+      "expected_event_uids": [79657479, 35702254, 23791358],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "type-jeux-video",
+      "category": "type_evenement",
+      "question": "Des animations autour des jeux vidéo ?",
+      "reference_answer": "L'exposition « Infinite Universes : Secret Cave » se tient au Centre tchèque de Paris (5 décembre 2025 - 14 mars 2026, vernissage le mercredi 28 janvier). La Cité des sciences propose aussi l'exposition « Les jeux vidéo sont-ils plus intelligents que nous ? ».",
+      "expected_event_uids": [37364419, 74950561, 10828579],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "lieu-cite-sciences",
+      "category": "lieu",
+      "question": "Que se passe-t-il à la Cité des sciences et de l'industrie ?",
+      "reference_answer": "La Cité des sciences et de l'Industrie propose le cycle « Les conférences » ainsi que l'exposition « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025).",
+      "expected_event_uids": [97942297, 10789521],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "lieu-bernardins",
+      "category": "lieu",
+      "question": "Quels événements au Collège des Bernardins ?",
+      "reference_answer": "Le Collège des Bernardins organise une Journée portes ouvertes (mardi 16 juin, 16h00) et le cycle « Droit, Liberté et Foi » avec la séance « Justice et violence : les réponses à la violence » (mercredi 15 octobre 2025, 19h30).",
+      "expected_event_uids": [73218065, 19733171],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "lieu-mandapa",
+      "category": "lieu",
+      "question": "Que propose le Théâtre Mandapa ?",
+      "reference_answer": "Le Théâtre Mandapa programme des spectacles de musiques et danses du monde : « Nawba mâya - Musique savante d'Algérie » (dimanche 11 janvier, 18h00), « La Journée des Maîtres » (dimanche 7 décembre 2025, 15h00), « La Parada Flamenca » (samedi 11 octobre 2025, 20h30) et « À l'orient de mon cœur - Turquie » (vendredi 12 décembre 2025, 20h30).",
+      "expected_event_uids": [25147408, 92659795, 19079190, 8238761],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "lieu-wallonie-bruxelles",
+      "category": "lieu",
+      "question": "Des événements au Centre Wallonie-Bruxelles ?",
+      "reference_answer": "Le Centre Wallonie-Bruxelles propose le 34e Festival « Le Court en dit long » (1 - 5 juin), l'installation « Procreation Lab » de Louise Assouly (13 novembre - 19 décembre 2025) et des soirées cinéma, dont une avec Boris Lehman (lundi 9 février, 20h00).",
+      "expected_event_uids": [84940012, 17129602, 9653472, 92725465],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "lieu-paroisses-messes",
+      "category": "lieu",
+      "question": "Y a-t-il des messes ou célébrations dans les paroisses parisiennes ?",
+      "reference_answer": "Oui : une Messe au Centre Robert Doisneau (jeudi 22 janvier, 15h30, paroisse Notre-Dame du Bon Conseil), la « Messe des Bergers » à la paroisse Saint-Jean-Baptiste-de-la-Salle (les mercredis du 2 au 16 décembre) et le Feu de la Saint-Jean à l'église Notre-Dame de la Croix (mercredi 24 juin, 20h00).",
+      "expected_event_uids": [20225448, 80604022, 72842658],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "periode-fete-musique",
+      "category": "periode",
+      "question": "Des concerts pour la Fête de la musique ?",
+      "reference_answer": "Pour la Fête de la musique, le JASS CLUB propose « Fête de la musique Jazz Soul & Pop ! » avec le Kicca Quartet, entrée libre (dimanche 21 juin, 19h00). D'autres concerts ont lieu à la même période, comme le Concert « Thanda Choir » à l'église Saint-Eustache.",
+      "expected_event_uids": [69969271, 23655695],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "periode-noel",
+      "category": "periode",
+      "question": "Des événements autour de Noël ?",
+      "reference_answer": "Plusieurs événements sont liés à Noël : une Retraite de Noël chez les frères de Jérusalem (24 et 25 décembre 2025), un Atelier chant « Chants de Noël » au Collège des Bernardins (samedi 29 novembre 2025, 15h00) et les vacances de Noël à la paroisse Saint-Jean-Baptiste-de-la-Salle (19 décembre 2026 - 3 janvier 2027).",
+      "expected_event_uids": [67618373, 71143061, 67722343],
+      "expects_no_match": false,
+      "expects_refusal": false
+    },
+    {
+      "id": "hors-perimetre-moteur",
+      "category": "hors_perimetre",
+      "question": "Comment réparer un moteur diesel ?",
+      "reference_answer": "Je n'ai pas trouvé d'événement correspondant à votre demande. Je peux seulement vous recommander des événements culturels à Paris.",
+      "expected_event_uids": [],
+      "expects_no_match": true,
+      "expects_refusal": true
+    },
+    {
+      "id": "hors-perimetre-recette",
+      "category": "hors_perimetre",
+      "question": "Donne-moi une recette de tiramisu.",
+      "reference_answer": "Je n'ai pas trouvé d'événement correspondant à votre demande. Je peux seulement vous recommander des événements culturels à Paris.",
+      "expected_event_uids": [],
+      "expects_no_match": true,
+      "expects_refusal": true
+    },
+    {
+      "id": "hors-perimetre-meteo",
+      "category": "hors_perimetre",
+      "question": "Quelle est la météo demain à Lyon ?",
+      "reference_answer": "Je ne fournis pas de météo et je ne couvre que des événements culturels à Paris : je n'ai donc rien à Lyon ni d'information sur le temps qu'il fera. Je peux en revanche vous proposer des événements parisiens.",
+      "expected_event_uids": [],
+      "expects_no_match": false,
+      "expects_refusal": true
+    }
+  ]
+}
