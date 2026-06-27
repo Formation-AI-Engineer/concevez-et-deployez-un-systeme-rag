@@ -61,14 +61,23 @@ jobs:
       - name: Synchroniser les dépendances (dev + eval)
         run: uv sync --extra dev --extra eval
 
+      # Pipeline complet : récupération Open Agenda -> structuration -> index FAISS -> évaluation.
+      # On récupère un échantillon réduit (rapidité/coût). NB : ce jeu est un instantané frais,
+      # distinct de l'index local sur lequel eval/qa_dataset.json est ancré — les métriques de
+      # couverture/ancrage peuvent donc différer du run local ; ici on valide surtout que la
+      # chaîne d'évaluation s'exécute de bout en bout (smoke + métriques sémantiques/Ragas).
       - name: Évaluer la qualité des réponses
         env:
+          OPENAGENDA_API_KEY: ${{ secrets.OPENAGENDA_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          API_REBUILD_TOKEN: ${{ secrets.API_REBUILD_TOKEN }}
         run: |
-          if [ ! -f data/processed/events.parquet ]; then
-            echo "::warning::Données absentes (data/processed/events.parquet non versionné) — évaluation ignorée."
+          if [ -z "$OPENAGENDA_API_KEY" ] || [ -z "$MISTRAL_API_KEY" ]; then
+            echo "::warning::Secrets MISTRAL_API_KEY / OPENAGENDA_API_KEY manquants — évaluation ignorée."
             exit 0
           fi
+          uv run python scripts/fetch_events.py --target-events 300 --max-agendas 15
+          uv run python scripts/preprocess_events.py
           uv run python scripts/build_index.py
           uv run python scripts/evaluate_rag.py --sample 5
 
