@@ -129,6 +129,43 @@ curl -X POST http://127.0.0.1:8000/rebuild -H "X-API-Token: <votre-jeton>"
 > (index absent) · `401` jeton `/rebuild` invalide · `500` erreur de génération (le détail est
 > journalisé côté serveur, jamais renvoyé au client).
 
+## Lancer avec Docker (étape 6)
+
+L'API est conteneurisée pour une **démo locale reproductible**. L'image **embarque l'index FAISS
+pré-construit et le modèle d'embeddings** : le conteneur démarre donc **sans dépendance réseau**
+et seule la génération Mistral (`POST /ask`) appelle l'API externe au moment de la requête —
+conformément à l'exigence « éviter de dépendre d'une connexion instable ».
+
+**Prérequis** : Docker installé, et `MISTRAL_API_KEY` renseignée dans `.env.local`
+(`cp .env.example .env.local`).
+
+```bash
+# Build de l'image (~5 min la 1re fois : téléchargement de torch CPU + modèle d'embeddings)
+docker build -t assistant-rag-evenements .
+
+# Run — les secrets sont injectés depuis .env.local (jamais copiés dans l'image)
+docker run --rm -p 8000:8000 --env-file .env.local assistant-rag-evenements
+```
+
+> **PyTorch CPU** : le projet étant entièrement CPU (`faiss-cpu`, embeddings `device="cpu"`), `torch`
+> est épinglé sur sa variante **CPU** (`+cpu`, via l'index PyTorch déclaré dans `pyproject.toml`).
+> On évite ainsi d'embarquer le runtime CUDA (~8 Go) : image plus légère et build plus rapide.
+
+Ou, plus simple, avec Docker Compose :
+
+```bash
+docker compose up --build      # build + démarrage ; Ctrl-C puis `docker compose down` pour arrêter
+```
+
+Une fois lancé : Swagger sur <http://127.0.0.1:8000/docs>, et les mêmes appels `curl` que ci-dessus
+(`/health`, `/ask`) fonctionnent à l'identique. `GET /health` doit renvoyer
+`{"status":"ok","assistant_ready":true,"indexed_events":4146}`.
+
+> **Stratégie d'index** : l'index pré-construit est **copié dans l'image** (rapide, hors-ligne).
+> Pour repartir de données fraîches, rejouer le pipeline en local
+> (`fetch_events.py` → `preprocess_events.py` → `build_index.py`) puis reconstruire l'image,
+> ou appeler `POST /rebuild` sur un conteneur disposant de `data/processed/` et du jeton.
+
 ## Documentation
 
 Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
@@ -137,6 +174,7 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 |-------|-------|
 | Contexte | [`contexte_general.md`](docs/contexte_general.md) |
 | Suivi | [`fiche_taches_projet7.md`](docs/fiche_taches_projet7.md) |
+| **Rapport technique** | [`rapport_technique.md`](docs/rapport_technique.md) |
 | 1 | [`etape1_configuration_environnement.md`](docs/etape1_configuration_environnement.md) |
 | 2 | [`etape2_preprocessing_openagenda.md`](docs/etape2_preprocessing_openagenda.md) |
 | 3 | [`etape3_base_vectorielle_faiss.md`](docs/etape3_base_vectorielle_faiss.md) |
@@ -146,10 +184,13 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 
 ## Statut
 
-🚧 POC en cours.
+✅ POC complet — les 6 étapes de la mission sont livrées (reste : finitions de soutenance).
 - ✅ Étape 1 — environnement uv, imports clés vérifiés, clés API validées
 - ✅ Étape 2 — récupération Open Agenda (1500 événements Paris, multi-agendas), nettoyage/structuration + tests unitaires
 - ✅ Étape 3 — chunking (4146 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche
 - ✅ Étape 4 — chaîne RAG LangChain (FAISS + Mistral), gating de pertinence, jeu de test annoté, évaluation (métriques locales + Ragas)
 - ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (78 tests OK)
-- ⏳ Étape 6 — conteneurisation Docker & démo
+- ✅ Étape 6 — conteneurisation Docker (Dockerfile + `.dockerignore` + `docker-compose.yml`),
+  image **3,8 Go** (torch CPU) qui build & run en local, `/health` `/ask` `/rebuild` validés de bout
+  en bout dans le conteneur ; [rapport technique](docs/rapport_technique.md) +
+  [présentation 16 slides](docs/presentation.pptx) (`scripts/build_presentation.py`).

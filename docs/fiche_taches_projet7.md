@@ -40,10 +40,10 @@ avec Docker, pour **Puls-Events**.
 | Swagger auto + gestion des erreurs (question vide…) | 5 | [ ] |
 | Test fonctionnel de l'API | 5 | [ ] |
 | Automatisation des métriques d'évaluation (script/CI) | 5 | [ ] |
-| Dockerfile + image qui build et run en local | 6 | [ ] |
-| Démo live fluide (question → réponse) | 6 | [ ] |
-| Rapport technique (PDF/README, template fourni) | 6 | [ ] |
-| Présentation PowerPoint (10–15 slides) | 6 | [ ] |
+| Dockerfile + image qui build et run en local | 6 | [x] |
+| Démo live fluide (question → réponse) | 6 | [x] |
+| Rapport technique (PDF/README, template fourni) | 6 | [x] |
+| Présentation PowerPoint (10–15 slides) | 6 | [x] |
 
 ## Vision d'ensemble
 

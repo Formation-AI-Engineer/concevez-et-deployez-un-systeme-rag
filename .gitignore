@@ -44,3 +44,6 @@ eval/reports/
 
 # Artefacts Windows (flux de données alternatifs)
 *:Zone.Identifier
+
+# Préparation de soutenance (notes perso — jamais versionnées)
+/soutenance_prive/
