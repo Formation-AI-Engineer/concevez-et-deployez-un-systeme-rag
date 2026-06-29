@@ -33,6 +33,7 @@ Open Agenda API ──► pré-processing (pandas) ──► chunks ──► em
 .
 ├── rag/             # Logique métier RAG (chargement, pré-processing, vectorstore, chaîne)
 ├── api/             # API REST FastAPI exposant le système
+├── app/             # Interface web Streamlit (chatbot) branchée sur l'API
 ├── scripts/         # Scripts CLI (récupération données, build index, évaluation)
 ├── tests/           # Tests unitaires
 ├── eval/            # Jeu de test annoté + rapports d'évaluation
@@ -151,11 +152,16 @@ docker run --rm -p 8000:8000 --env-file .env.local assistant-rag-evenements
 > est épinglé sur sa variante **CPU** (`+cpu`, via l'index PyTorch déclaré dans `pyproject.toml`).
 > On évite ainsi d'embarquer le runtime CUDA (~8 Go) : image plus légère et build plus rapide.
 
-Ou, plus simple, avec Docker Compose :
+Ou, plus simple, avec Docker Compose — qui lance **l'API *et* l'interface web** d'un coup :
 
 ```bash
 docker compose up --build      # build + démarrage ; Ctrl-C puis `docker compose down` pour arrêter
+# API     → http://localhost:8000/docs   (Swagger)
+# Chatbot → http://localhost:8501        (interface Streamlit)
 ```
+
+> L'UI (service `ui`, image légère `Dockerfile.ui` = streamlit + requests, sans la stack RAG)
+> attend que l'API soit *healthy* puis la contacte via le réseau interne (`http://api:8000`).
 
 Une fois lancé : Swagger sur <http://127.0.0.1:8000/docs>, et les mêmes appels `curl` que ci-dessus
 (`/health`, `/ask`) fonctionnent à l'identique. `GET /health` doit renvoyer
@@ -165,6 +171,30 @@ Une fois lancé : Swagger sur <http://127.0.0.1:8000/docs>, et les mêmes appels
 > Pour repartir de données fraîches, rejouer le pipeline en local
 > (`fetch_events.py` → `preprocess_events.py` → `build_index.py`) puis reconstruire l'image,
 > ou appeler `POST /rebuild` sur un conteneur disposant de `data/processed/` et du jeton.
+
+## Interface web (chatbot Streamlit)
+
+Une interface conversationnelle **Streamlit** offre une démo « grand public » du système. Elle
+interroge **l'API REST** (`POST /ask`, `GET /health`) et n'embarque **aucun modèle** : toute la
+logique RAG reste côté API (séparation métier / présentation).
+
+**Prérequis** : l'API doit tourner (en local ou via Docker), avec l'index FAISS construit.
+
+```bash
+# 1. Démarrer l'API (dans un terminal)
+uv run uvicorn api.main:app                      # → http://127.0.0.1:8000
+
+# 2. Lancer l'interface (dans un autre terminal)
+uv run --extra ui streamlit run app/streamlit_app.py   # → http://localhost:8501
+```
+
+> **Tout en une commande** : `docker compose up --build` démarre l'API **et** l'interface
+> ensemble (cf. section Docker ci-dessus) — aucune installation locale requise.
+
+> L'URL de l'API est configurable via la variable `RAG_API_URL` (défaut `http://127.0.0.1:8000`)
+> ou directement dans la barre latérale de l'interface. La barre latérale affiche aussi l'**état
+> du service** (nombre d'événements indexés) et des **questions d'exemple** cliquables. Les
+> réponses sont accompagnées de leurs **événements sources** (titre, date, lieu, lien).
 
 ## Documentation
 

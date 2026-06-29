@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1
+#
+# Étape extra — Image de l'interface web Streamlit (chatbot).
+#
+# L'UI est un simple CLIENT HTTP de l'API : elle n'embarque NI modèle d'embeddings, NI index
+# FAISS, NI la stack RAG (torch/faiss/langchain). On la garde donc volontairement MINIMALE
+# (streamlit + requests) — image légère et build rapide, séparée de l'image API (~3,8 Go).
+#
+# Build :  docker build -f Dockerfile.ui -t assistant-rag-ui .
+# Run   :  docker run --rm -p 8501:8501 -e RAG_API_URL=http://host.docker.internal:8000 assistant-rag-ui
+#
+# En pratique, on lance l'ensemble (API + UI) via docker-compose (voir docker-compose.yml).
+
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # URL de l'API par défaut : nom du service `api` sur le réseau docker-compose.
+    RAG_API_URL=http://api:8000
+
+# Utilisateur non privilégié (bonne pratique sécurité).
+RUN useradd --create-home --uid 1000 appuser
+WORKDIR /app
+RUN pip install --no-cache-dir "streamlit>=1.30.0" "requests>=2.32.0" \
+    && chown appuser:appuser /app
+USER appuser
+
+# Seuls l'app Streamlit et son thème sont nécessaires (pas de code métier RAG).
+COPY --chown=appuser:appuser app/ app/
+COPY --chown=appuser:appuser .streamlit/ .streamlit/
+
+EXPOSE 8501
+
+# Sonde de vivacité native de Streamlit.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD python -c "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8501/_stcore/health').status==200 else 1)"
+
+CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]

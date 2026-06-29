@@ -41,6 +41,10 @@ eval = [
     "ragas>=0.2.0",
     "datasets>=3.0.0",
 ]
+# Interface web de démonstration (chatbot Streamlit branché sur l'API REST).
+ui = [
+    "streamlit>=1.30.0",
+]
 dev = [
     "pytest>=8.0.0",
     "httpx>=0.27.0",
@@ -77,6 +81,8 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.Header", "fastapi.Query"]
 # Générateur du support de soutenance : le contenu textuel des slides (phrases en français)
 # vit en clair dans le module ; on tolère les lignes longues pour préserver sa lisibilité.
 "scripts/build_presentation.py" = ["E501"]
+# Interface Streamlit : le CSS et les libellés FR en clair tolèrent les lignes longues.
+"app/streamlit_app.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

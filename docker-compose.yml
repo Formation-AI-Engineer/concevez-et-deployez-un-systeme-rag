@@ -1,7 +1,10 @@
-# Étape 6.1 (optionnel) — lancement simplifié de l'API conteneurisée.
+# Étape 6.1 (+ extra UI) — lancement de la démo complète (API + interface web).
 #
-#   docker compose up --build      # build + démarrage
+#   docker compose up --build      # build + démarrage de l'API et de l'UI
 #   docker compose down            # arrêt
+#
+#   API     → http://localhost:8000   (Swagger sur /docs)
+#   Chatbot → http://localhost:8501   (interface Streamlit)
 #
 # Les secrets (au minimum MISTRAL_API_KEY) sont lus depuis .env.local — non versionné.
 # Copier .env.example -> .env.local et renseigner la clé avant le premier lancement.
@@ -15,4 +18,20 @@ services:
       - "8000:8000"
     env_file:
       - .env.local
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    image: assistant-rag-ui:latest
+    container_name: assistant-rag-ui
+    ports:
+      - "8501:8501"
+    environment:
+      # Nom du service `api` résolu sur le réseau interne de docker-compose.
+      - RAG_API_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
     restart: unless-stopped
