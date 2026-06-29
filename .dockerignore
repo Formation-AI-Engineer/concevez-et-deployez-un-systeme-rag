@@ -1,0 +1,48 @@
+# Contexte de build Docker — n'envoyer au démon que le strict nécessaire.
+# NB : on EMBARQUE volontairement vectorstore/index/ et data/processed/ (index + données
+# structurées) ; ils ne sont donc PAS exclus ici, contrairement au .gitignore.
+
+# Environnements virtuels / Python
+.venv/
+env/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Secrets — ne JAMAIS copier de clé d'API dans l'image
+.env
+.env.*
+*.local
+
+# Données brutes volumineuses (régénérables) — seul data/processed/ est embarqué
+data/raw/
+
+# Évaluation / notebooks / explorations — hors périmètre du service
+eval/
+notebooks/
+tests/
+
+# Livrables & docs lourds (PDF, Word)
+*.pdf
+*.docx
+docs/
+
+# Caches & outillage
+.cache/
+.pytest_cache/
+.ruff_cache/
+.git/
+.github/
+.idea/
+.vscode/
+.claude/
+
+# Artefacts Docker eux-mêmes
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# OS / divers
+.DS_Store
+*:Zone.Identifier

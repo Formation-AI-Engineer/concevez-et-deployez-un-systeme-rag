@@ -14,11 +14,20 @@ dependencies = [
     # --- Modèle / embeddings ---
     "mistralai>=1.0.0",
     "sentence-transformers>=3.0.0",
+    # torch est tiré par sentence-transformers ; on l'épingle explicitement sur la variante
+    # CPU (cf. [tool.uv.sources]) — tout le projet tourne en CPU (faiss-cpu, device="cpu"),
+    # inutile d'embarquer le runtime CUDA (~8 Go) dans l'image / l'environnement.
+    "torch>=2.0.0",
     # --- Base vectorielle (CPU pour la portabilité, cf. énoncé) ---
     "faiss-cpu>=1.8.0",
     # --- Récupération & manipulation des données Open Agenda ---
     "requests>=2.32.0",
     "pandas>=2.0.0",
+    # Moteur Parquet de pandas (lecture/écriture de data/processed/*.parquet) : utilisé par le
+    # pré-processing, build_index.py et l'endpoint /rebuild. Dépendance cœur (et non plus
+    # seulement transitive de l'extra `eval`), sans quoi un install minimal ne peut pas
+    # (re)construire l'index.
+    "pyarrow>=15.0.0",
     "python-dotenv>=1.0.0",
     # --- API REST ---
     "fastapi>=0.115.0",
@@ -38,7 +47,19 @@ dev = [
     "ruff>=0.5.0",
     "jupyter>=1.0.0",
     "ipykernel>=6.0.0",
+    # Génération du support de soutenance (scripts/build_presentation.py -> docs/presentation.pptx).
+    "python-pptx>=0.6.23",
 ]
+
+# Variante CPU de PyTorch (cf. dépendance `torch` ci-dessus) : index officiel PyTorch CPU,
+# utilisé uniquement pour torch (explicit = true → n'affecte pas les autres paquets).
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
 
 [tool.ruff]
 line-length = 100
@@ -51,6 +72,11 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 # `Depends`/`Header`/`Query` dans les défauts d'arguments est l'idiome standard de FastAPI
 # (injection de dépendances), pas le piège mutable que vise B008.
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Header", "fastapi.Query"]
+
+[tool.ruff.lint.per-file-ignores]
+# Générateur du support de soutenance : le contenu textuel des slides (phrases en français)
+# vit en clair dans le module ; on tolère les lignes longues pour préserver sa lisibilité.
+"scripts/build_presentation.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

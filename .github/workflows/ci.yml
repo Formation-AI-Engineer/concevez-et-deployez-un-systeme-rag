@@ -35,11 +35,13 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
 
+      # `--extra dev` est requis : ruff/pytest sont des extras optionnels (pas un groupe `dev` uv).
+      # Sans lui, `uv run` resynchronise l'environnement sur le set par défaut et les retire.
       - name: Lint (ruff)
-        run: uv run ruff check .
+        run: uv run --extra dev ruff check .
 
       - name: Tests (pytest)
-        run: uv run pytest -q
+        run: uv run --extra dev pytest -q
 
   evaluate:
     name: Évaluation RAG (Ragas) — manuel
