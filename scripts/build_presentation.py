@@ -105,7 +105,7 @@ SLIDES: list[dict] = [
             ("Paris", "zone ciblée"),
             ("< 1 an", "fenêtre temporelle"),
             ("~1500", "événements indexés"),
-            ("4146", "chunks vectorisés"),
+            ("4076", "chunks vectorisés"),
         ],
     },
     {
@@ -188,11 +188,11 @@ SLIDES: list[dict] = [
             ("500", "erreur interne — détail jamais exposé"),
         ],
         "quality": [
-            "78 tests automatisés (unitaires + API).",
+            "81 tests automatisés (unitaires + API).",
             "CI GitHub Actions : lint + tests à chaque push.",
             "Jeton /rebuild comparé en temps constant.",
         ],
-        "notes": "CI GitHub Actions : job qualité (ruff + 78 tests) à chaque push/PR ; job d'évaluation "
+        "notes": "CI GitHub Actions : job qualité (ruff + 81 tests) à chaque push/PR ; job d'évaluation "
         "(pipeline complet fetch → preprocess → build_index → evaluate) déclenchable manuellement, artefacts "
         "publiés. Sources dédupliquées par identifiant d'événement avant la réponse.",
     },
@@ -212,26 +212,27 @@ SLIDES: list[dict] = [
         "kicker": "10  •  RÉSULTATS",
         "title": "Rapport technique & évaluation",
         "metrics": [
-            ("0.71", "Similarité\nsémantique moy."),
-            ("0.88", "Couverture\ndes infos clés"),
-            ("16/20", "Réponses\ncorrectes"),
-            ("100 %", "Correct par\nlieu & période"),
+            ("0.77", "Similarité\nsémantique moy."),
+            ("0.71", "Couverture\ndes infos clés"),
+            ("14/20", "Réponses\ncorrectes"),
+            ("20", "Questions\nannotées"),
         ],
         "bars_title": "Réussite par catégorie",
         "bars": [
-            ("Lieu", 1.0, "100 %", False),
-            ("Période", 1.0, "100 %", False),
+            ("Lieu (n=5)", 0.8, "80 %", False),
+            ("Période (n=2)", 0.5, "50 %", False),
             ("Type d'événement", 0.8, "80 %", False),
             ("Hors-périmètre", 0.33, "33 %*", True),
         ],
         "aside_title": "Recul critique",
         "aside": [
             "* Un refus hors-périmètre — pourtant le bon comportement — est compté « incorrect » par la métrique.",
-            "Les 16/20 sont donc un plancher pessimiste ; détail complet dans le rapport technique.",
+            "Les 14/20 sont donc un plancher pessimiste ; détail complet dans le rapport technique.",
         ],
-        "notes": "Jeu annoté à la main (20 questions, réponses fondées sur les événements réellement indexés). "
-        "Métriques : similarité sémantique, couverture des infos clés, classification, Ragas. Renvoyer au rapport "
-        "technique (docs/rapport_technique.md) ; assumer le recul sur les métriques (artefact hors-périmètre).",
+        "notes": "Jeu annoté (20 questions, réponses fondées sur les événements réellement indexés), réévalué "
+        "sur les données rafraîchies (filtrage temporel désactivé pour la reproductibilité). Métriques : "
+        "similarité, couverture, classification (+ Ragas en option). Période n=2 (1 question = 50 %). Assumer "
+        "le recul sur le hors-périmètre (artefact de métrique).",
     },
     {
         "kind": "repo",
@@ -245,7 +246,7 @@ SLIDES: list[dict] = [
             "│      vectorstore · chain · config\n"
             "├── api/         FastAPI (main, schemas)\n"
             "├── scripts/     pipeline & outils CLI\n"
-            "├── tests/       78 tests (10 fichiers)\n"
+            "├── tests/       81 tests (10 fichiers)\n"
             "├── eval/        jeu annoté + rapports\n"
             "├── docs/        fiches + rapport tech.\n"
             "├── Dockerfile · docker-compose.yml\n"

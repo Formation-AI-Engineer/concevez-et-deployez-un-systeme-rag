@@ -31,7 +31,7 @@ en conservant la fluidité d'un LLM.
 - **Zone géographique** : Paris (paramétrable).
 - **Période** : événements de moins d'un an et à venir (fenêtre glissante de 12 mois).
 - **Données** : ~**1500 événements** culturels parisiens issus de l'**API Open Agenda**, découpés en
-  **4146 chunks** indexés.
+  **4076 chunks** indexés.
 
 ---
 
@@ -102,7 +102,7 @@ Les événements sont récupérés en JSON brut dans `data/raw/events.json`.
 - **taille de chunk : 800 caractères**, **chevauchement : 100** — compromis entre granularité (un chunk
   cible un événement et son contexte) et préservation du sens aux frontières.
 - Les **métadonnées** de l'événement (uid, titre, date, lieu, ville, url, catégorie) sont attachées à
-  **chaque chunk** (essentiel pour restituer les sources). Total : **4146 chunks**.
+  **chaque chunk** (essentiel pour restituer les sources). Total : **4076 chunks**.
 
 **Embedding** (`rag/embeddings.py`).
 - Modèle : **`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`** (HuggingFace), exécuté
@@ -141,11 +141,19 @@ Le contexte (chunks récupérés) et la question sont injectés dans un *human p
 réponse **honnête et déterministe** (« Je n'ai pas trouvé d'événement correspondant »)
 **sans appeler le LLM** — gain de robustesse et d'économie d'API.
 
+**Filtrage temporel (événements à venir).** Après le gating, un filtre par **métadonnées de date**
+ne conserve que les événements dont la date de fin est **≥ aujourd'hui** (les événements sans date
+exploitable sont conservés). La recherche élargit d'abord le nombre de candidats puis tronque à
+`top_k`, et la **date du jour est injectée dans le prompt** pour que le modèle privilégie les
+événements à venir et respecte une période demandée. On évite ainsi de recommander des événements
+**passés** (réglable via `FILTER_PAST_EVENTS`).
+
 **Limites du modèle.**
 - Dépendance à une **API externe** (coût, latence, disponibilité réseau au moment de la requête).
 - Le LLM peut **reformuler** au-delà du strict contexte malgré le prompt (atténué par le gating et
   l'évaluation).
-- Pas de raisonnement temporel fin (« ce week-end ») : la notion de date repose sur le texte indexé.
+- Raisonnement temporel relatif fin (« ce week-end ») non géré ; le filtrage ci-dessus traite en
+  revanche le cas « événements à venir / d'une année donnée ».
 
 ---
 
@@ -190,7 +198,7 @@ curl -X POST http://127.0.0.1:8000/ask \
   -d '{"question": "Quels concerts de jazz puis-je voir à Paris ?"}'
 ```
 
-**Tests effectués et documentés.** **78 tests** automatisés (pytest) couvrant pré-traitement,
+**Tests effectués et documentés.** **81 tests** automatisés (pytest) couvrant pré-traitement,
 chunking, embeddings, vectorstore, et l'API (réponses, codes d'erreur, protection `/rebuild`).
 Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/PR.
 
@@ -206,11 +214,17 @@ Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/
 ## 7. Évaluation du système
 
 **Jeu de test annoté** (`eval/qa_dataset.json`).
-- **20 paires** question / réponse de référence, annotées à la main le 2026-06-26.
-- **Méthode d'annotation** : pour chaque question, on interroge le *retriever*, on lit les événements
-  **réellement récupérés** (titre, date, lieu) et on rédige une réponse de référence **n'utilisant que
-  ces faits réels**. Chaque paire indique les `expected_event_uids` pertinents, et des drapeaux
-  `expects_no_match` / `expects_refusal` pour les cas hors-périmètre.
+- **20 paires** question / réponse de référence (jeu initial annoté à la main, étape 4.3), **réannotées
+  sur l'index courant** via `scripts/build_qa_dataset.py` après rafraîchissement des données.
+- **Méthode d'annotation** (inchangée) : pour chaque question, on interroge le *retriever*, on lit les
+  événements **réellement récupérés** (titre, date, lieu) et on construit une réponse de référence
+  **n'utilisant que ces faits réels**. Chaque paire indique les `expected_event_uids` pertinents, et des
+  drapeaux `expects_no_match` / `expects_refusal` pour les cas hors-périmètre.
+- **Évaluation sur instantané figé.** Les chiffres ci-dessous correspondent à l'**instantané de
+  données** sur lequel le jeu a été annoté. L'index servant la démo peut être **rafraîchi** (cf.
+  `fetch_events` + filtrage des événements à venir) ; pour rejouer l'évaluation à l'identique, on se
+  place sur cet instantané (ou on réannote `eval/qa_dataset.json` sur les données courantes). Les
+  tests d'ancrage du jeu se neutralisent automatiquement si l'index a divergé de l'instantané annoté.
 - **Catégories** : `type_evenement` (10), `lieu` (5), `periode` (2), `hors_perimetre` (3).
 
 **Métriques.**
@@ -219,32 +233,37 @@ Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/
 - **Classification** correcte / partielle / incorrecte (seuils combinés).
 - **Ragas** (faithfulness, context recall/precision) — sur échantillon (appels LLM coûteux).
 
-**Résultats obtenus** (run complet 20 questions, `report_20260628_155304`).
+**Résultats obtenus** (run complet 20 questions sur l'index **rafraîchi**, jeu réannoté via
+`scripts/build_qa_dataset.py` ; filtrage temporel désactivé pour la reproductibilité).
 
 | Indicateur | Valeur |
 |---|---|
-| Similarité sémantique moyenne | **0.71** |
-| Couverture des infos clés | **0.875** |
-| Correctes / partielles / incorrectes | **16 / 1 / 3** (80 % correctes) |
+| Similarité sémantique moyenne | **0.77** |
+| Couverture des infos clés | **0.71** |
+| Correctes / partielles / incorrectes | **14 / 3 / 3** (70 % correctes) |
 
 | Catégorie | n | Sim. moy. | Taux correctes |
 |---|---|---|---|
-| `lieu` | 5 | 0.75 | **100 %** |
-| `periode` | 2 | 0.76 | **100 %** |
-| `type_evenement` | 10 | 0.71 | 80 % |
-| `hors_perimetre` | 3 | 0.62 | 33 % |
+| `lieu` | 5 | 0.82 | **80 %** |
+| `periode` | 2 | 0.84 | 50 % (n=2) |
+| `type_evenement` | 10 | 0.78 | 80 % |
+| `hors_perimetre` | 3 | 0.63 | 33 % |
 
 **Analyse qualitative.**
-- **Points forts** : excellentes performances sur les questions par **lieu** et **période** (100 %), et
-  bonnes par **type d'événement**. Les réponses citent systématiquement titre, date et lieu réels.
-- **Cas faible identifié** : `type-dedicace-litterature` (sim 0.25, couverture 0) — le retriever n'a pas
+- **Points forts** : bonnes performances par **lieu** (80 %) et par **type d'événement** (80 %), avec
+  une **similarité sémantique élevée** (0.77 en moyenne). Les réponses citent systématiquement titre,
+  date et lieu réels.
+- **Sensibilité d'échantillon** : `periode` ne compte que **2 questions** ; une seule réponse partielle
+  fait chuter le taux à 50 % — à lire avec prudence vu la taille.
+- **Cas faible identifié** : `type-dedicace-litterature` (sim 0.28, couverture 0) — le retriever n'a pas
   remonté l'événement attendu : piste d'amélioration côté recherche (cf. §8).
 - **Artefact de métrique sur le hors-périmètre** : les questions hors-périmètre où le système **refuse
   honnêtement** (« je n'ai pas trouvé… ») obtiennent une **faible similarité** à une référence pourtant
   de refus, et sont comptées « incorrectes ». **Le comportement est en réalité correct** — la métrique
   pénalise à tort ces refus, à interpréter avec recul.
-- **Ragas** (sur échantillon) : *faithfulness* ~0.53, *context precision* ~0.71 — cohérent avec un
-  ancrage factuel correct, à étendre sur l'ensemble du jeu.
+- **Ragas** (optionnel, coûteux) : non recalculé sur l'instantané rafraîchi ; sur l'instantané
+  précédent, *faithfulness* ~0.53 et *context precision* ~0.71 — cohérent avec un ancrage factuel
+  correct. Rejouable via `uv run --extra eval python scripts/evaluate_rag.py`.
 
 ---
 
@@ -284,7 +303,7 @@ Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/
 ├── rag/             # Logique métier RAG (chargement, pré-processing, chunking, embeddings, vectorstore, chaîne)
 ├── api/             # API REST FastAPI (main.py, schemas.py)
 ├── scripts/         # CLI : fetch_events, preprocess_events, build_index, search, evaluate_rag
-├── tests/           # 78 tests unitaires/fonctionnels (pytest)
+├── tests/           # 81 tests unitaires/fonctionnels (pytest)
 ├── eval/            # Jeu de test annoté (qa_dataset.json) + rapports d'évaluation
 ├── data/            # Données Open Agenda (raw/ + processed/) — non versionnées
 ├── vectorstore/     # Index FAISS — reconstructible, non versionné
@@ -340,5 +359,5 @@ Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/
 ```bash
 docker build -t assistant-rag-evenements .
 docker run --rm -p 8000:8000 --env-file .env.local assistant-rag-evenements
-# → Swagger : http://127.0.0.1:8000/docs   |   GET /health → {"status":"ok","indexed_events":4146}
+# → Swagger : http://127.0.0.1:8000/docs   |   GET /health → {"status":"ok","indexed_events":4076}
 ```

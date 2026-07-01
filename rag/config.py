@@ -64,6 +64,15 @@ class Settings:
     # requêtes hors-périmètre ~1.0+. Au-delà du seuil pour tous les docs → réponse honnête
     # « aucun événement correspondant » sans appeler le LLM.
     relevance_threshold: float = float(_get("RELEVANCE_THRESHOLD", "0.9"))
+    # Filtrage temporel : par défaut on n'expose que les événements À VENIR (date de fin >=
+    # aujourd'hui) ; ceux sans date exploitable sont conservés. Désactivable via
+    # FILTER_PAST_EVENTS=false (ex. pour rejouer une évaluation sur un instantané figé).
+    filter_past_events: bool = (_get("FILTER_PAST_EVENTS", "true") or "true").lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
+    )
 
     log_level: str = _get("LOG_LEVEL", "INFO")
 

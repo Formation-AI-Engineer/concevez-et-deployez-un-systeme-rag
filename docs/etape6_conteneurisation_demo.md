@@ -24,7 +24,7 @@ endpoint API exposé dans un conteneur + démo live + présentation structurée 
 - [x] Stratégie d'**index** retenue : **index pré-construit copié dans l'image** (+ modèle d'embeddings
       pré-téléchargé au build) → démarrage **hors-ligne**, seul `POST /ask` appelle Mistral à la requête.
       Justification : exigence « éviter de dépendre d'une connexion instable » + démo rapide/déterministe.
-- [x] `docker build` + `docker run` testés en local : `/health` → `ok` (4146 événements indexés),
+- [x] `docker build` + `docker run` testés en local : `/health` → `ok` (4076 événements indexés),
       `/ask` retourne une réponse cohérente + sources, Swagger accessible sur le port exposé.
 - [x] (Optionnel) `docker-compose.yml` (service `api`, port 8000, `env_file: .env.local`).
 

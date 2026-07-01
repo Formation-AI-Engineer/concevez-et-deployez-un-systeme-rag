@@ -13,6 +13,8 @@ infos clés (titre/date/lieu) dans le contexte, et plusieurs scénarios d'intera
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from langchain_core.documents import Document
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
 
@@ -90,6 +92,50 @@ def test_answer_repond_honnetement_sans_document_pertinent():
     res = assistant.answer("comment réparer un moteur diesel ?")
     assert res.answer == NO_MATCH_MESSAGE
     assert res.sources == []
+
+
+# --- Filtrage temporel (événements à venir) ------------------------------------
+
+_REF = datetime(2026, 6, 29, tzinfo=timezone.utc)  # « aujourd'hui » figé pour les tests
+
+
+def test_retrieve_ecarte_les_evenements_passes():
+    """Filtrage temporel actif : un événement déjà terminé est écarté, l'à-venir conservé."""
+    scored = [
+        (_event(1, "Expo passée", date_end="2025-10-01T18:00:00+02:00"), 0.30),
+        (_event(2, "Expo à venir", date_end="2026-09-01T18:00:00+02:00"), 0.35),
+    ]
+    assistant = RAGAssistant(
+        vectorstore=FakeVectorStore(scored),
+        llm=FakeListChatModel(responses=["x"]),
+        filter_past_events=True,
+        reference_date=_REF,
+    )
+    assert [d.metadata["uid"] for d in assistant.retrieve("expo")] == [2]
+
+
+def test_retrieve_conserve_les_evenements_sans_date():
+    """Un événement sans date exploitable est conservé (on n'écarte pas par excès de prudence)."""
+    scored = [(_event(1, "Événement sans date ISO"), 0.30)]  # seules des dates texte (date_range)
+    assistant = RAGAssistant(
+        vectorstore=FakeVectorStore(scored),
+        llm=FakeListChatModel(responses=["x"]),
+        filter_past_events=True,
+        reference_date=_REF,
+    )
+    assert [d.metadata["uid"] for d in assistant.retrieve("quelque chose")] == [1]
+
+
+def test_retrieve_sans_filtre_temporel_conserve_le_passe():
+    """Filtrage désactivé : les événements passés sont conservés (instantané figé)."""
+    scored = [(_event(1, "Expo passée", date_end="2025-10-01T18:00:00+02:00"), 0.30)]
+    assistant = RAGAssistant(
+        vectorstore=FakeVectorStore(scored),
+        llm=FakeListChatModel(responses=["x"]),
+        filter_past_events=False,
+        reference_date=_REF,
+    )
+    assert [d.metadata["uid"] for d in assistant.retrieve("expo")] == [1]
 
 
 # --- Génération augmentée (scénarios d'interaction) ----------------------------

@@ -165,7 +165,7 @@ docker compose up --build      # build + démarrage ; Ctrl-C puis `docker compos
 
 Une fois lancé : Swagger sur <http://127.0.0.1:8000/docs>, et les mêmes appels `curl` que ci-dessus
 (`/health`, `/ask`) fonctionnent à l'identique. `GET /health` doit renvoyer
-`{"status":"ok","assistant_ready":true,"indexed_events":4146}`.
+`{"status":"ok","assistant_ready":true,"indexed_events":4076}`.
 
 > **Stratégie d'index** : l'index pré-construit est **copié dans l'image** (rapide, hors-ligne).
 > Pour repartir de données fraîches, rejouer le pipeline en local
@@ -217,9 +217,9 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 ✅ POC complet — les 6 étapes de la mission sont livrées (reste : finitions de soutenance).
 - ✅ Étape 1 — environnement uv, imports clés vérifiés, clés API validées
 - ✅ Étape 2 — récupération Open Agenda (1500 événements Paris, multi-agendas), nettoyage/structuration + tests unitaires
-- ✅ Étape 3 — chunking (4146 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche
+- ✅ Étape 3 — chunking (4076 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche
 - ✅ Étape 4 — chaîne RAG LangChain (FAISS + Mistral), gating de pertinence, jeu de test annoté, évaluation (métriques locales + Ragas)
-- ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (78 tests OK)
+- ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (81 tests OK)
 - ✅ Étape 6 — conteneurisation Docker (Dockerfile + `.dockerignore` + `docker-compose.yml`),
   image **3,8 Go** (torch CPU) qui build & run en local, `/health` `/ask` `/rebuild` validés de bout
   en bout dans le conteneur ; [rapport technique](docs/rapport_technique.md) +

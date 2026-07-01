@@ -5,16 +5,26 @@
     "n_pairs": 20,
     "relevance_threshold": 0.9,
     "annotation_method": "Voir eval/README.md. Pour chaque question, on interroge le retriever, on lit les événements réellement récupérés (titre, date, lieu) et on rédige à la main une réponse de référence n'utilisant que ces faits. expected_event_uids liste les uid pertinents retrouvés ; expects_no_match=true quand le seuil écarte tout document ; expects_refusal=true quand des documents remontent mais qu'aucun ne répond réellement à la question.",
-    "annotated_on": "2026-06-26",
-    "categories": ["type_evenement", "lieu", "periode", "hors_perimetre"]
+    "annotated_on": "2026-06-29",
+    "categories": [
+      "type_evenement",
+      "lieu",
+      "periode",
+      "hors_perimetre"
+    ],
+    "note": "Réannoté sur l'index courant via scripts/build_qa_dataset.py (références ancrées sur les événements réellement récupérés ; filtrage temporel OFF)."
   },
   "pairs": [
     {
       "id": "type-jazz",
       "category": "type_evenement",
       "question": "Quels concerts de jazz puis-je voir à Paris ?",
-      "reference_answer": "Plusieurs concerts de jazz sont proposés : le festival international Jazzycolors (27 octobre - 9 décembre 2025), le Concert de la Saint-Jean à l'église Saint-Nicolas des Champs (mercredi 24 juin, 20h30) et « Jazz au Café Maa n°4 » avec Aki Rissanen et Dominique Pifarély à l'Institut finlandais (jeudi 30 avril, 20h00).",
-      "expected_event_uids": [47475785, 93449035, 53076575],
+      "reference_answer": "Voici des événements correspondants : « Jazzycolors - Festival de jazz international » (27 octobre - 9 décembre 2025, Paris) ; « CONCERT DE LA SAINT-JEAN » (Mercredi 24 juin, 20h30, Église Saint-Nicolas des Champs Paris) ; « Jazz au Café Maa n°4 : Aki Rissanen et Dominique Pifarély » (Jeudi 30 avril, 20h00, Institut finlandais Paris).",
+      "expected_event_uids": [
+        47475785,
+        93449035,
+        53076575
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -22,8 +32,11 @@
       "id": "type-exposition",
       "category": "type_evenement",
       "question": "Je cherche une exposition à voir.",
-      "reference_answer": "Deux expositions sont à l'affiche : « Frontière », prolongée à la Cité des sciences et de l'Industrie (3 juin - 1 septembre), et « La condition extra-terrestre » de l'Observatoire de l'Espace du CNES au Centre Wallonie-Bruxelles (12 - 27 septembre 2025).",
-      "expected_event_uids": [95415032, 72321187],
+      "reference_answer": "Voici des événements correspondants : « L'exposition Frontière se prolonge » (3 juin - 1 septembre, Cité des sciences et de l'Industrie Paris) ; « Exposition “La condition extra-terrestre” de L’observatoire de l’Espace du CNES » (12 - 27 septembre 2025, Centre Wallonie-Bruxelles I Galerie d'exposition Paris).",
+      "expected_event_uids": [
+        95415032,
+        72321187
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -31,8 +44,13 @@
       "id": "type-orgue-sacree",
       "category": "type_evenement",
       "question": "Y a-t-il des concerts d'orgue ou de musique sacrée ?",
-      "reference_answer": "Oui : L'Heure d'Orgue de Saint-Gervais (certains samedis du 4 octobre 2025 au 4 juillet 2026), le Concert « Thanda Choir » à l'église Saint-Eustache (vendredi 5 juin, 20h30) et le Concert des Talas à l'église Saint-Jacques du Haut-Pas (mardi 23 juin, 20h00).",
-      "expected_event_uids": [35702254, 23655695, 29562423],
+      "reference_answer": "Voici des événements correspondants : « L'Heure d'Orgue de Saint-Gervais » (4 octobre 2025 - 4 juillet 2026, certains samedis, Eglise Saint-Gervais Paris) ; « Et si l'on danse ? » (Dimanche 21 juin, 17h00, Église Saint-André de l'Europe Paris) ; « Concert “Thanda Choir” » (Vendredi 5 juin, 20h30, Église Saint-Eustache Paris) ; « Concert des Talas (Aumônerie élèves de l'ENS) » (Mardi 23 juin, 20h00, Église Saint-Jacques du Haut-Pas Paris).",
+      "expected_event_uids": [
+        35702254,
+        23162099,
+        23655695,
+        29562423
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -40,8 +58,13 @@
       "id": "type-cinema",
       "category": "type_evenement",
       "question": "Quelles séances de cinéma sont proposées ?",
-      "reference_answer": "Le Centre Wallonie-Bruxelles programme plusieurs films dans sa salle de cinéma : « Nino dans la nuit » de Laurent Micheli (lundi 23 février, 19h30), « Les filles du ciel » de Bérangère McNeese (lundi 16 mars, 20h00) et « Sainte-Marie-aux-Mines » de Claude Schmitz (lundi 26 janvier, 20h00). Le Festival du film taïwanais a aussi lieu à La Filmothèque du Quartier Latin (1 - 10 avril).",
-      "expected_event_uids": [74504684, 46594023, 20127806, 5542474],
+      "reference_answer": "Voici des événements correspondants : « « NINO DANS LA NUIT », un film de Laurent Micheli » (Lundi 23 février, 19h30, Centre Wallonie-Bruxelles I Salle de Cinéma Paris) ; « « LES FILLES DU CIEL », un film de Bérangère McNeese » (Lundi 16 mars, 20h00, Centre Wallonie-Bruxelles I Salle de Cinéma Paris) ; « « SAINTE-MARIE-AUX-MINES », un film de Claude Schmitz » (Lundi 26 janvier, 20h00, Centre Wallonie-Bruxelles I Salle de Cinéma Paris) ; « Festival du film taïwanais à Paris » (1 - 10 avril, La Filmothèque du Quartier Latin Paris).",
+      "expected_event_uids": [
+        74504684,
+        46594023,
+        20127806,
+        5542474
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -49,8 +72,13 @@
       "id": "type-danse",
       "category": "type_evenement",
       "question": "Je voudrais assister à un spectacle de danse.",
-      "reference_answer": "Plusieurs spectacles de danse sont proposés : « BôL - Flamenco et kathak » au Théâtre Mandapa (vendredi 24 avril, 20h30), la Soirée Rhizome #Danse au Centre Wallonie-Bruxelles (jeudi 19 mars, 20h00) et le spectacle « Je_Burnt Offering » au Centre Culturel Coréen (vendredi 21 novembre 2025, 19h00).",
-      "expected_event_uids": [31223498, 83028451, 36354350],
+      "reference_answer": "Voici des événements correspondants : « Jouons ensemble à... Just Dance ! » (24 février 2022 - 2 mai 2026, Cité des sciences et de l'Industrie Paris) ; « BôL - Flamenco et kathak » (Vendredi 24 avril, 20h30, Théâtre Mandapa Paris) ; « Soirée Rhizome #Danse avec Eli Mathieu-Bustos - Darius Dolatyari-Dolatdoust » (Jeudi 19 mars, 20h00, Centre Wallonie-Bruxelles I Salle de théâtre Paris) ; « Spectacle « Je_Burnt Offering » » (Vendredi 21 novembre 2025, 19h00, CENTRE CULTUREL CORÉEN Paris).",
+      "expected_event_uids": [
+        47327198,
+        31223498,
+        83028451,
+        36354350
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -58,8 +86,13 @@
       "id": "type-conference-spiritualite",
       "category": "type_evenement",
       "question": "Y a-t-il des conférences ou rencontres sur la spiritualité ?",
-      "reference_answer": "Oui, notamment au Collège des Bernardins : « Burn-out, dépression, désolation spirituelle : distinguer pour mieux accompagner » (samedi 21 novembre, 09h30) et le « Dialogue judéo-chrétien sur la crise écologique » (jeudi 11 juin, 19h00). Les Fraternités de Jérusalem proposent aussi une retraite de rentrée à l'église Saint-Gervais (21 septembre - 15 octobre).",
-      "expected_event_uids": [19948450, 20208717, 96676928],
+      "reference_answer": "Voici des événements correspondants : « Burn-out, dépression, désolation spirituelle : distinguer pour mieux accompagner » (Samedi 21 novembre, 09h30, Collège des Bernardins Paris) ; « Retraite de rentrée 2026 » (21 septembre - 15 octobre, Eglise Saint-Gervais Paris) ; « Retraite de rentrée 2025 : \"Rentrer avec le Seigneur !\" » (22 septembre - 16 octobre 2025, Eglise Saint-Gervais Paris) ; « Dialogue judéo-chrétien sur la crise écologique : présentation du livre “La Terre Céleste” » (Jeudi 11 juin, 19h00, Collège des Bernardins Paris).",
+      "expected_event_uids": [
+        19948450,
+        96676928,
+        705685,
+        20208717
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -67,8 +100,13 @@
       "id": "type-sciences",
       "category": "type_evenement",
       "question": "Des activités pour découvrir les sciences ?",
-      "reference_answer": "La Cité des sciences et de l'Industrie propose l'exposition « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025). Le Festival Double•Science se tient par ailleurs au Ground Control, à Paris (12 et 13 juin).",
-      "expected_event_uids": [10789521, 59963599],
+      "reference_answer": "Voici des événements correspondants : « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025, Cité des sciences et de l'Industrie Paris) ; « Festival Double•Science les 12 & 13 juin 2026 au Ground Control à Paris » (12 et 13 juin, Ground Control Paris) ; « Samedi de l'Access » (Samedi 22 novembre 2025, 09h30, Cité des sciences et de l'Industrie Paris) ; « Les expositions » (23 septembre 2025 - 24 octobre 2027, Cité des sciences et de l'Industrie Paris).",
+      "expected_event_uids": [
+        10789521,
+        59963599,
+        58395086,
+        42639064
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -76,8 +114,13 @@
       "id": "type-dedicace-litterature",
       "category": "type_evenement",
       "question": "Une rencontre ou dédicace avec un auteur ?",
-      "reference_answer": "Le Collège des Bernardins propose un cycle de rencontres autour d'œuvres classiques, le lundi à 12h45 : « Tartuffe » de Molière (15 juin), « Tobie des Marais » de Sylvie Germain (18 mai), « Jacques le Fataliste » de Diderot (23 mars) et « Mémoires d'une jeune fille rangée » de Simone de Beauvoir (9 mars).",
-      "expected_event_uids": [48000437, 68732973, 76618150, 80488536],
+      "reference_answer": "Voici des événements correspondants : « Molière : Tartuffe - La pièce la plus scandaleuse du Grand siècle » (Lundi 15 juin, 12h45, Collège des Bernardins Paris) ; « Sylvie Germain : Tobie des Marais - Réenchanter le monde » (Lundi 18 mai, 12h45, Collège des Bernardins Paris) ; « Diderot : Jacques le Fataliste et son maître - Comment se sont-ils rencontrés ? » (Lundi 23 mars, 12h45, Collège des Bernardins Paris) ; « Simone de Beauvoir : Mémoires d’une jeune fille rangée - Une intellectuelle à la recherche de son enfance » (Lundi 9 mars, 12h45, Collège des Bernardins Paris).",
+      "expected_event_uids": [
+        48000437,
+        68732973,
+        76618150,
+        80488536
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -85,8 +128,13 @@
       "id": "type-musique-classique",
       "category": "type_evenement",
       "question": "Un concert de musique classique ?",
-      "reference_answer": "Le Collège des Bernardins propose « Mozart : Requiem et Symphonie n°3 » (mardi 2 décembre 2025, 20h00). On peut aussi écouter L'Heure d'Orgue de Saint-Gervais (certains samedis) et le Concert « Faites de la musique ! » à Saint-Pierre de Montmartre (dimanche 21 juin, 14h00).",
-      "expected_event_uids": [79657479, 35702254, 23791358],
+      "reference_answer": "Voici des événements correspondants : « L'Heure d'Orgue de Saint-Gervais » (4 octobre 2025 - 4 juillet 2026, certains samedis, Eglise Saint-Gervais Paris) ; « Mozart : Requiem et Symphonie n°3 » (Mardi 2 décembre 2025, 20h00, Collège des Bernardins Paris) ; « CONCERT DE LA SAINT-JEAN » (Mercredi 24 juin, 20h30, Église Saint-Nicolas des Champs Paris) ; « Dimanches Musicaux – Récital d’orgue » (Dimanche 8 février, 16h00, Église de La Madeleine Paris).",
+      "expected_event_uids": [
+        35702254,
+        79657479,
+        93449035,
+        66331868
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -94,8 +142,12 @@
       "id": "type-jeux-video",
       "category": "type_evenement",
       "question": "Des animations autour des jeux vidéo ?",
-      "reference_answer": "L'exposition « Infinite Universes : Secret Cave » se tient au Centre tchèque de Paris (5 décembre 2025 - 14 mars 2026, vernissage le mercredi 28 janvier). La Cité des sciences propose aussi l'exposition « Les jeux vidéo sont-ils plus intelligents que nous ? ».",
-      "expected_event_uids": [37364419, 74950561, 10828579],
+      "reference_answer": "Voici des événements correspondants : « Exposition Infinite Universes : Secret Cave » (5 décembre 2025 - 14 mars 2026, Centre tchèque de Paris Paris) ; « Vernissage - Infinite Universes : Secret Cave » (Mercredi 28 janvier, 18h00, Centre tchèque de Paris Paris) ; « Les jeux vidéo sont-ils plus intelligents que nous ? » (5 février 2022 - 27 février 2026, Cité des sciences et de l'Industrie Paris).",
+      "expected_event_uids": [
+        37364419,
+        74950561,
+        10828579
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -103,8 +155,11 @@
       "id": "lieu-cite-sciences",
       "category": "lieu",
       "question": "Que se passe-t-il à la Cité des sciences et de l'industrie ?",
-      "reference_answer": "La Cité des sciences et de l'Industrie propose le cycle « Les conférences » ainsi que l'exposition « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025).",
-      "expected_event_uids": [97942297, 10789521],
+      "reference_answer": "Voici des événements correspondants : « Les conférences » (17 février 2022 - 27 janvier 2026, Cité des sciences et de l'Industrie Paris) ; « Machine arrière, le radio transistor » (6 mai - 2 novembre 2025, Cité des sciences et de l'Industrie Paris).",
+      "expected_event_uids": [
+        97942297,
+        10789521
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -112,8 +167,11 @@
       "id": "lieu-bernardins",
       "category": "lieu",
       "question": "Quels événements au Collège des Bernardins ?",
-      "reference_answer": "Le Collège des Bernardins organise une Journée portes ouvertes (mardi 16 juin, 16h00) et le cycle « Droit, Liberté et Foi » avec la séance « Justice et violence : les réponses à la violence » (mercredi 15 octobre 2025, 19h30).",
-      "expected_event_uids": [73218065, 19733171],
+      "reference_answer": "Voici des événements correspondants : « Journée portes ouvertes du Collège des Bernardins » (Mardi 16 juin, 16h00, Collège des Bernardins Paris) ; « Cycle Droit, Liberté et Foi - Justice et violence : “Les réponses à la violence” » (Mercredi 15 octobre 2025, 19h30, Collège des Bernardins Paris).",
+      "expected_event_uids": [
+        73218065,
+        19733171
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -121,8 +179,13 @@
       "id": "lieu-mandapa",
       "category": "lieu",
       "question": "Que propose le Théâtre Mandapa ?",
-      "reference_answer": "Le Théâtre Mandapa programme des spectacles de musiques et danses du monde : « Nawba mâya - Musique savante d'Algérie » (dimanche 11 janvier, 18h00), « La Journée des Maîtres » (dimanche 7 décembre 2025, 15h00), « La Parada Flamenca » (samedi 11 octobre 2025, 20h30) et « À l'orient de mon cœur - Turquie » (vendredi 12 décembre 2025, 20h30).",
-      "expected_event_uids": [25147408, 92659795, 19079190, 8238761],
+      "reference_answer": "Voici des événements correspondants : « Nawba mâya - Musique savante d'Algérie » (Dimanche 11 janvier, 18h00, Théâtre Mandapa Paris) ; « La Journée des Maîtres - Topeng, Kathakali, Nô et Kabuki. » (Dimanche 7 décembre 2025, 15h00, Théâtre Mandapa Paris) ; « La Parada Flamenca » (Samedi 11 octobre 2025, 20h30, Théâtre Mandapa Paris) ; « À l’orient de mon cœur - Turquie - Des troubadours aux aşıks... » (Vendredi 12 décembre 2025, 20h30, Théâtre Mandapa Paris).",
+      "expected_event_uids": [
+        25147408,
+        92659795,
+        19079190,
+        8238761
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -130,8 +193,13 @@
       "id": "lieu-wallonie-bruxelles",
       "category": "lieu",
       "question": "Des événements au Centre Wallonie-Bruxelles ?",
-      "reference_answer": "Le Centre Wallonie-Bruxelles propose le 34e Festival « Le Court en dit long » (1 - 5 juin), l'installation « Procreation Lab » de Louise Assouly (13 novembre - 19 décembre 2025) et des soirées cinéma, dont une avec Boris Lehman (lundi 9 février, 20h00).",
-      "expected_event_uids": [84940012, 17129602, 9653472, 92725465],
+      "reference_answer": "Voici des événements correspondants : « 34e Festival Le Court en dit long » (1 - 5 juin, Centre Wallonie-Bruxelles I Salle de Cinéma Paris) ; « Installation «Procreation Lab » de Louise Assouly » (13 novembre - 19 décembre 2025, Centre Wallone-Bruxelles I 46Digital en foyer Paris) ; « Soirée cinéma avec Boris Lehman » (Lundi 9 février, 20h00, Centre Wallonie-Bruxelles I Salle de Cinéma Paris) ; « “L’ENFANT BELIER”, un film de Marta Bergman » (Jeudi 9 avril, 20h00, Centre Wallonie-Bruxelles I Salle de Cinéma Paris).",
+      "expected_event_uids": [
+        84940012,
+        17129602,
+        9653472,
+        92725465
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -139,8 +207,13 @@
       "id": "lieu-paroisses-messes",
       "category": "lieu",
       "question": "Y a-t-il des messes ou célébrations dans les paroisses parisiennes ?",
-      "reference_answer": "Oui : une Messe au Centre Robert Doisneau (jeudi 22 janvier, 15h30, paroisse Notre-Dame du Bon Conseil), la « Messe des Bergers » à la paroisse Saint-Jean-Baptiste-de-la-Salle (les mercredis du 2 au 16 décembre) et le Feu de la Saint-Jean à l'église Notre-Dame de la Croix (mercredi 24 juin, 20h00).",
-      "expected_event_uids": [20225448, 80604022, 72842658],
+      "reference_answer": "Voici des événements correspondants : « Récital de Noël et du Nouvel An » (Dimanche 4 janvier, 16h00, Église de La Madeleine Paris) ; « Journées d'amitié » (30 et 31 mai, Maison des Œuvres, paroisse Saint-Léon Paris) ; « Messe des « Bergers » » (2 - 16 décembre, les mercredis, paroisse Saint-Jean-Baptiste-de-la-Salle Paris) ; « Feu de la Saint-Jean » (Mercredi 24 juin, 20h00, Église Notre-Dame de la Croix Paris).",
+      "expected_event_uids": [
+        73688919,
+        70252049,
+        80604022,
+        72842658
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -148,8 +221,13 @@
       "id": "periode-fete-musique",
       "category": "periode",
       "question": "Des concerts pour la Fête de la musique ?",
-      "reference_answer": "Pour la Fête de la musique, le JASS CLUB propose « Fête de la musique Jazz Soul & Pop ! » avec le Kicca Quartet, entrée libre (dimanche 21 juin, 19h00). D'autres concerts ont lieu à la même période, comme le Concert « Thanda Choir » à l'église Saint-Eustache.",
-      "expected_event_uids": [69969271, 23655695],
+      "reference_answer": "Voici des événements correspondants : « Fête de la musique Jazz Soul & Pop ! Kicca Quartet — Entrée Libre » (Dimanche 21 juin, 19h00, JASS CLUB Paris) ; « Concert “Thanda Choir” » (Vendredi 5 juin, 20h30, Église Saint-Eustache Paris) ; « Kimberly Gordon Quartet » (Vendredi 26 décembre 2025, 19h30, 21h30, 22h30, JASS CLUB Paris) ; « Kimberly Gordon Quartet » (Vendredi 26 décembre 2025, 19h30, 21h30, 22h30, JASS CLUB Paris).",
+      "expected_event_uids": [
+        69969271,
+        23655695,
+        11752582,
+        39101251
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
@@ -157,8 +235,12 @@
       "id": "periode-noel",
       "category": "periode",
       "question": "Des événements autour de Noël ?",
-      "reference_answer": "Plusieurs événements sont liés à Noël : une Retraite de Noël chez les frères de Jérusalem (24 et 25 décembre 2025), un Atelier chant « Chants de Noël » au Collège des Bernardins (samedi 29 novembre 2025, 15h00) et les vacances de Noël à la paroisse Saint-Jean-Baptiste-de-la-Salle (19 décembre 2026 - 3 janvier 2027).",
-      "expected_event_uids": [67618373, 71143061, 67722343],
+      "reference_answer": "Voici des événements correspondants : « Retraite de Noël chez les frères à Paris » (24 et 25 décembre 2025, Fraternité monastique des frères de Jérusalem à Paris Paris) ; « Vacances de Noël » (19 décembre 2026 - 3 janvier 2027, paroisse Saint-Jean-Baptiste-de-la-Salle Paris) ; « Atelier chant “Chants de Noël” » (Samedi 29 novembre 2025, 15h00, Collège des Bernardins Paris).",
+      "expected_event_uids": [
+        67618373,
+        67722343,
+        71143061
+      ],
       "expects_no_match": false,
       "expects_refusal": false
     },
