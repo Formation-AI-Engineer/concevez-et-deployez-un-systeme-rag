@@ -175,7 +175,7 @@ SLIDES: list[dict] = [
             ("500", "erreur interne — détail jamais exposé"),
         ],
         "quality": [
-            "81 tests automatisés (unitaires + API).",
+            "82 tests automatisés (unitaires + API).",
             "CI GitHub Actions : lint + tests à chaque push.",
             "Jeton /rebuild comparé en temps constant.",
         ],
@@ -225,7 +225,7 @@ SLIDES: list[dict] = [
             "│      vectorstore · chain · config\n"
             "├── api/         FastAPI (main, schemas)\n"
             "├── scripts/     pipeline & outils CLI\n"
-            "├── tests/       81 tests (10 fichiers)\n"
+            "├── tests/       82 tests (10 fichiers)\n"
             "├── eval/        jeu annoté + rapports\n"
             "├── docs/        fiches + rapport tech.\n"
             "├── Dockerfile · docker-compose.yml\n"

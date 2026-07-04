@@ -198,7 +198,7 @@ curl -X POST http://127.0.0.1:8000/ask \
   -d '{"question": "Quels concerts de jazz puis-je voir à Paris ?"}'
 ```
 
-**Tests effectués et documentés.** **81 tests** automatisés (pytest) couvrant pré-traitement,
+**Tests effectués et documentés.** **82 tests** automatisés (pytest) couvrant pré-traitement,
 chunking, embeddings, vectorstore, et l'API (réponses, codes d'erreur, protection `/rebuild`).
 Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/PR.
 
@@ -303,7 +303,7 @@ Intégration continue (GitHub Actions) : **lint (ruff) + tests** à chaque push/
 ├── rag/             # Logique métier RAG (chargement, pré-processing, chunking, embeddings, vectorstore, chaîne)
 ├── api/             # API REST FastAPI (main.py, schemas.py)
 ├── scripts/         # CLI : fetch_events, preprocess_events, build_index, search, evaluate_rag
-├── tests/           # 81 tests unitaires/fonctionnels (pytest)
+├── tests/           # 82 tests unitaires/fonctionnels (pytest)
 ├── eval/            # Jeu de test annoté (qa_dataset.json) + rapports d'évaluation
 ├── data/            # Données Open Agenda (raw/ + processed/) — non versionnées
 ├── vectorstore/     # Index FAISS — reconstructible, non versionné

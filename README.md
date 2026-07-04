@@ -219,7 +219,7 @@ Le déroulé du projet est découpé en fiches d'étape dans [`docs/`](docs/) :
 - ✅ Étape 2 — récupération Open Agenda (1500 événements Paris, multi-agendas), nettoyage/structuration + tests unitaires
 - ✅ Étape 3 — chunking (4076 chunks), embeddings HuggingFace locaux, index FAISS persistant + tests de recherche
 - ✅ Étape 4 — chaîne RAG LangChain (FAISS + Mistral), gating de pertinence, jeu de test annoté, évaluation (métriques locales + Ragas)
-- ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (81 tests OK)
+- ✅ Étape 5 — API REST FastAPI (`/ask`, `/rebuild` protégé, `/health`, Swagger) + tests fonctionnels (82 tests OK)
 - ✅ Étape 6 — conteneurisation Docker (Dockerfile + `.dockerignore` + `docker-compose.yml`),
   image **3,8 Go** (torch CPU) qui build & run en local, `/health` `/ask` `/rebuild` validés de bout
   en bout dans le conteneur ; [rapport technique](docs/rapport_technique.md) +

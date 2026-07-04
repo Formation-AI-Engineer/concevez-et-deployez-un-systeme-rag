@@ -73,6 +73,12 @@ class Settings:
         "no",
         "off",
     )
+    # Nombre de voisins récupérés AVANT filtrage temporel. L'ingestion couvre 12 mois, donc le
+    # corpus est très majoritairement composé d'événements passés : une fenêtre étroite (top_k)
+    # ne remonterait que des voisins passés, écartés ensuite -> réponse « aucun événement » à
+    # tort. On élargit fortement pour que les top_k retournés soient bien les événements À VENIR
+    # les plus proches. L'index FAISS est plat (recherche exacte) : un k élevé ne coûte quasi rien.
+    filter_fetch_k: int = int(_get("FILTER_FETCH_K", "200"))
 
     log_level: str = _get("LOG_LEVEL", "INFO")
 

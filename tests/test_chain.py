@@ -114,6 +114,28 @@ def test_retrieve_ecarte_les_evenements_passes():
     assert [d.metadata["uid"] for d in assistant.retrieve("expo")] == [2]
 
 
+def test_retrieve_elargit_pour_atteindre_un_a_venir_au_dela_de_top_k():
+    """Filtrage actif : un à-venir noyé sous de nombreux passés (au-delà de top_k) est remonté.
+
+    Reproduit le cas réel : le corpus est majoritairement passé, donc les voisins immédiats sont
+    des événements terminés. Grâce à ``filter_fetch_k`` élargi, l'à-venir pertinent — ici au rang
+    30, bien au-delà de ``top_k`` — n'est plus écarté à tort.
+    """
+    scored = [
+        (_event(i, f"Passé {i}", date_end="2025-10-01T18:00:00+02:00"), 0.30 + i * 0.001)
+        for i in range(30)
+    ]
+    scored.append((_event(999, "À venir", date_end="2026-09-01T18:00:00+02:00"), 0.40))
+    assistant = RAGAssistant(
+        vectorstore=FakeVectorStore(scored),
+        llm=FakeListChatModel(responses=["x"]),
+        filter_past_events=True,
+        filter_fetch_k=200,
+        reference_date=_REF,
+    )
+    assert [d.metadata["uid"] for d in assistant.retrieve("quelque chose")] == [999]
+
+
 def test_retrieve_conserve_les_evenements_sans_date():
     """Un événement sans date exploitable est conservé (on n'écarte pas par excès de prudence)."""
     scored = [(_event(1, "Événement sans date ISO"), 0.30)]  # seules des dates texte (date_range)

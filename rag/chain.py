@@ -141,6 +141,7 @@ class RAGAssistant:
         top_k: int | None = None,
         relevance_threshold: float | None = None,
         filter_past_events: bool | None = None,
+        filter_fetch_k: int | None = None,
         reference_date: datetime | None = None,
     ) -> None:
         self.vectorstore = vectorstore or load_vectorstore()
@@ -153,6 +154,11 @@ class RAGAssistant:
         # permet de figer « aujourd'hui » en test ; sinon on prend l'heure courante à la requête.
         self.filter_past_events = (
             settings.filter_past_events if filter_past_events is None else filter_past_events
+        )
+        # Fenêtre de récupération élargie AVANT filtrage temporel (cf. config) : garantit que les
+        # événements à venir les plus proches ne sont pas noyés sous des voisins passés.
+        self.filter_fetch_k = (
+            settings.filter_fetch_k if filter_fetch_k is None else filter_fetch_k
         )
         self.reference_date = reference_date
         # Retriever LangChain « brut » (interface publique réutilisable par l'API étape 5).
@@ -179,11 +185,13 @@ class RAGAssistant:
 
         ``similarity_search_with_score`` renvoie la distance cosinus (plus petite = plus proche) ;
         on ne conserve que les documents sous ``relevance_threshold``. Quand le filtrage temporel
-        est actif, on élargit d'abord la recherche (les voisins immédiats peuvent être passés) puis
-        on ne garde que les événements à venir, avant de tronquer à ``top_k``. Une requête
-        hors-périmètre renvoie une liste vide -> réponse honnête dans ``answer()``.
+        est actif, on élargit fortement la recherche (``filter_fetch_k``) car le corpus est
+        majoritairement passé : sans cela, les voisins immédiats sont surtout des événements
+        terminés, et les événements à venir pertinents — plus loin dans le classement — seraient
+        écartés à tort. On ne garde ensuite que les à-venir, avant de tronquer à ``top_k``. Une
+        requête hors-périmètre renvoie une liste vide -> réponse honnête dans ``answer()``.
         """
-        fetch_k = max(self.top_k * 5, 20) if self.filter_past_events else self.top_k
+        fetch_k = self.filter_fetch_k if self.filter_past_events else self.top_k
         scored = self.vectorstore.similarity_search_with_score(question, k=fetch_k)
         docs = [doc for doc, distance in scored if distance <= self.relevance_threshold]
         if self.filter_past_events:
