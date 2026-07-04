@@ -40,7 +40,7 @@ SLIDE_H = Inches(7.5)
 FOOTER_TEXT = "Projet 7 — Assistant RAG d'événements culturels  •  Lamine CAMARA"
 
 # --- Contenu : un dict par slide --------------------------------------------------------------
-# Slide de garde : kind="title". Slide standard : kicker + title + bullets (+ stats / notes).
+# Slide de garde : kind="title". Slide standard : kicker + title + bullets (+ stats).
 # Une puce est soit une str (niveau 0), soit un tuple (texte, niveau) pour un sous-niveau.
 SLIDES: list[dict] = [
     {
@@ -58,12 +58,10 @@ SLIDES: list[dict] = [
         "bullets": [
             "1 · Le système RAG développé — contexte, architecture, données, modèle.",
             "2 · Démonstration de l'API en direct (interrogation → réponse).",
-            "3 · Rapport technique & résultats d'évaluation.",
+            "3 · Résultats d'évaluation.",
             "4 · Structure du dépôt GitHub & principaux scripts.",
-            ("Puis discussion : choix modèle/archi · données & embeddings · évaluation ·", 1),
-            ("limites · reproductibilité, industrialisation & usage métier.", 1),
+            "5 · Échanges & discussion.",
         ],
-        "notes": "Annoncer le plan calqué sur les 4 livrables attendus, puis la discussion.",
     },
     {
         "kicker": "01  •  CONTEXTE",
@@ -74,11 +72,10 @@ SLIDES: list[dict] = [
             "Ex. « Quels concerts de jazz à Paris ? », « Une expo près de la Cité des sciences ? ».",
             "Difficulté : une offre qui change sans cesse et des faits (dates, lieux) à ne pas se tromper.",
         ],
-        "notes": "Poser le décor métier avant la technique : à qui sert l'assistant et pourquoi.",
     },
     {
         "kicker": "02  •  PRINCIPE",
-        "title": "Qu'est-ce qu'un système RAG  ? (sans jargon)",
+        "title": "Qu'est-ce qu'un système RAG  ?",
         "bullets": [
             "Un LLM seul répond « de mémoire » : risque d'événements faux ou périmés.",
             "RAG = Retrieval-Augmented Generation.",
@@ -86,7 +83,6 @@ SLIDES: list[dict] = [
             ("2) le LLM RÉDIGE la réponse UNIQUEMENT à partir de ces événements.", 1),
             "Bénéfice : la fluidité d'un LLM + l'exactitude d'une base de données.",
         ],
-        "notes": "Analogie : répondre avec la fiche sous les yeux plutôt que de mémoire.",
     },
     {
         "kind": "objectives",
@@ -128,8 +124,6 @@ SLIDES: list[dict] = [
             ("Réponse", "+ sources citées", False),
         ],
         "footnote": "Séparation nette : logique métier (rag/) vs exposition HTTP (api/).",
-        "notes": "Insister sur les deux temps (indexation hors-ligne vs interrogation temps réel), le maillon "
-        "partagé qu'est l'index FAISS, et le chargement unique des modèles au démarrage (performance).",
     },
     {
         "kicker": "05  •  DONNÉES",
@@ -141,9 +135,6 @@ SLIDES: list[dict] = [
             "Diversité : plafond par agenda pour limiter un biais thématique (~1/3 d'événements religieux).",
             "Sortie : 1500 événements (16 agendas), jeu typé au format Parquet — choisi pour son I/O rapide et typé.",
         ],
-        "notes": "C'est l'axe « gestion des données » de la discussion. Insister sur l'ingénierie réelle : "
-        "contournement du 403 (fetch par agendas + re-filtrage ville), bug de pagination corrigé (curseur au lieu "
-        "d'offset), gestion des manques et du biais thématique. ~1500 événements, médiane ~1000 caractères/événement.",
     },
     {
         "kicker": "06  •  VECTORISATION",
@@ -165,10 +156,6 @@ SLIDES: list[dict] = [
             "Gating : si aucun événement pertinent (seuil cosinus) → refus honnête SANS appeler le LLM.",
             "Résultat : pas d'invention, et une réponse déterministe + économique hors-périmètre.",
         ],
-        "notes": "Le gating est un argument fort : honnêteté du système et économie d'appels API. "
-        "Détails si challengé (axe « choix de modèle ») : top-k = 4 passages récupérés, température 0.2 "
-        "(réponses factuelles et reproductibles), seuil cosinus ≈ 0,9. Embeddings en local (≠ API Mistral) "
-        "pour le coût, la reproductibilité et la confidentialité ; Mistral réservé à la génération.",
     },
     {
         "kind": "api",
@@ -192,9 +179,6 @@ SLIDES: list[dict] = [
             "CI GitHub Actions : lint + tests à chaque push.",
             "Jeton /rebuild comparé en temps constant.",
         ],
-        "notes": "CI GitHub Actions : job qualité (ruff + 81 tests) à chaque push/PR ; job d'évaluation "
-        "(pipeline complet fetch → preprocess → build_index → evaluate) déclenchable manuellement, artefacts "
-        "publiés. Sources dédupliquées par identifiant d'événement avant la réponse.",
     },
     {
         "kicker": "09  •  DÉMO",
@@ -205,12 +189,11 @@ SLIDES: list[dict] = [
             "Scénario 3 : question hors-périmètre → refus honnête (pas d'invention).",
             "Le tout servi par le conteneur Docker, en local (Swagger /docs).",
         ],
-        "notes": "Démo en direct : basculer vers Swagger /docs ; garder un scénario de refus.",
     },
     {
         "kind": "results",
         "kicker": "10  •  RÉSULTATS",
-        "title": "Rapport technique & évaluation",
+        "title": "Résultats d'évaluation",
         "metrics": [
             ("0.77", "Similarité\nsémantique moy."),
             ("0.71", "Couverture\ndes infos clés"),
@@ -229,10 +212,6 @@ SLIDES: list[dict] = [
             "* Un refus hors-périmètre — pourtant le bon comportement — est compté « incorrect » par la métrique.",
             "Les 14/20 sont donc un plancher pessimiste ; détail complet dans le rapport technique.",
         ],
-        "notes": "Jeu annoté (20 questions, réponses fondées sur les événements réellement indexés), réévalué "
-        "sur les données rafraîchies (filtrage temporel désactivé pour la reproductibilité). Métriques : "
-        "similarité, couverture, classification (+ Ragas en option). Période n=2 (1 question = 50 %). Assumer "
-        "le recul sur le hors-périmètre (artefact de métrique).",
     },
     {
         "kind": "repo",
@@ -263,8 +242,6 @@ SLIDES: list[dict] = [
             "check_imports.py — vérification des dépendances.",
             "build_presentation.py — ce support.",
         ],
-        "notes": "Parcourir le dépôt en direct sur GitHub : montrer rag/ (métier) vs api/ (HTTP), puis dérouler "
-        "le pipeline scripts/ (fetch → preprocess → build_index) et les outils.",
     },
     {
         "kicker": "12  •  DÉPLOIEMENT",
@@ -276,9 +253,6 @@ SLIDES: list[dict] = [
             "Environnement figé avec uv (pyproject + uv.lock) → installs déterministes.",
             "Secrets jamais versionnés ni copiés dans l'image : injectés au run via --env-file.",
         ],
-        "notes": "Reproductibilité (axe industrialisation) : uv.lock + .python-version figent les versions → "
-        "installs déterministes. Secrets hors dépôt et hors image ; côté CI, stockés dans GitHub Secrets. "
-        "Pipeline d'indexation rejouable de zéro (fetch → preprocess → build_index).",
     },
     {
         "kind": "roadmap",
@@ -296,14 +270,12 @@ SLIDES: list[dict] = [
             ("Recherche exacte FAISS dimensionnée pour le POC (~4K vecteurs).",
              "Index IVF/HNSW, base vectorielle managée, auth & rate-limiting."),
         ],
-        "notes": "Assumer les limites ouvertement (axe « limites de la solution actuelle ») et montrer que "
-        "chacune a une piste d'industrialisation concrète — c'est l'axe « reproductibilité / industrialisation ».",
     },
     {
         "kind": "title",
         "kicker": "DISCUSSION  •  MERCI",
         "title": ["Questions  ?"],
-        "subtitle": "Choix · données & embeddings · évaluation · limites · industrialisation.",
+        "subtitle": "Merci de votre attention — échanges & discussion.",
         "tech": "Code · rapport technique · fiches d'étape disponibles dans le dépôt",
         "author": ["Lamine CAMARA", "Assistant RAG — Puls-Events (POC)"],
     },
@@ -448,8 +420,6 @@ def _roadmap_slide(slide, s, page, total):
         y += row_h + gap
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _objective_card(slide, left, top, w, h, num, title, body):
@@ -481,8 +451,6 @@ def _objectives_slide(slide, s, page, total):
     _metric_cards(slide, s["perimeter"], top=5.2)
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _results_slide(slide, s, page, total):
@@ -515,8 +483,6 @@ def _results_slide(slide, s, page, total):
           Inches(panel_h - 0.9), s["aside"], size=12.5, color=DARK, space_after=8, line=1.12)
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _flow_box(slide, left, top, w, h, title, sub, highlight):
@@ -569,8 +535,6 @@ def _architecture_slide(slide, s, page, total):
     caption(6.45, s["footnote"])
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _api_slide(slide, s, page, total):
@@ -628,8 +592,6 @@ def _api_slide(slide, s, page, total):
           qp, size=11.5, color=DARK, space_after=6, line=1.08)
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _repo_slide(slide, s, page, total):
@@ -673,8 +635,6 @@ def _repo_slide(slide, s, page, total):
           op, size=12, color=BODY, space_after=6, line=1.08)
 
     _footer(slide, page, total)
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def _content_slide(slide, s, page, total):
@@ -694,8 +654,6 @@ def _content_slide(slide, s, page, total):
         _stats_panel(slide, s["stats"])
     _footer(slide, page, total)
 
-    if s.get("notes"):
-        slide.notes_slide.notes_text_frame.text = s["notes"]
 
 
 def build() -> Path:
